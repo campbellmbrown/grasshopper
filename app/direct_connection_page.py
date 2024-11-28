@@ -248,8 +248,7 @@ class DirectConnectionsWidget(QWidget):
         dialog = DirectConnectionDialog("New Direct Connection")
         result = dialog.exec_()
         if result == QDialog.DialogCode.Accepted:
-            new_direct_connection = dialog.to_direct_connection()
-            self.model.add_direct_connection(new_direct_connection)
+            self.model.add_direct_connection(dialog.to_direct_connection())
 
     def _on_edit_direct_connection(self, row: int):
         """Open the edit direct connection dialog."""
@@ -260,8 +259,7 @@ class DirectConnectionsWidget(QWidget):
         dialog.populate_fields(direct_connection)
         result = dialog.exec_()
         if result == QDialog.DialogCode.Accepted:
-            edited_direct_connection = dialog.to_direct_connection()
-            self.model.update_direct_connection(source_index.row(), edited_direct_connection)
+            self.model.update_direct_connection(source_index.row(), dialog.to_direct_connection())
 
     def _on_duplicate_direct_connection(self, row: int):
         """Duplicate a direct connection."""
@@ -272,7 +270,7 @@ class DirectConnectionsWidget(QWidget):
         dialog.populate_fields(direct_connection)
         result = dialog.exec_()
         if result == QDialog.DialogCode.Accepted:
-            self.model.add_direct_connection(direct_connection)
+            self.model.add_direct_connection(dialog.to_direct_connection())
 
     def _on_delete_direct_connection(self, row: int):
         """Delete a direct connection."""
