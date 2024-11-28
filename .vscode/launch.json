@@ -5,7 +5,7 @@
             "name": "StaSSH",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/run.py",
+            "program": "${workspaceFolder}/stassh.py",
             "console": "integratedTerminal"
         }
     ]

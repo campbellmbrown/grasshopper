@@ -49,9 +49,20 @@ pip install -r requirements.txt
 ## From the Command Line
 
 ```bash
-python run.py
+python stassh.py
 ```
 
 ## From VS Code
 
 You can also run the application from VS Code by running the `StaSSH` configuration.
+
+# Publishing
+
+Build into a single executable without the console using PyInstaller:
+
+```bash
+rm -rf dist build stassh.spec
+pyinstaller --onefile --noconsole --add-data "VERSION;." stassh.py
+```
+
+The ``stassh.exe`` file will be in the ``dist`` directory.
