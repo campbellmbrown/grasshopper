@@ -1,7 +1,16 @@
 import logging
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDockWidget, QMainWindow, QTextEdit, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import (
+    QDockWidget,
+    QMainWindow,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
+
+from app.direct_connection_page import DirectConnectionsWidget
 
 
 class Logger(logging.Handler):
@@ -20,14 +29,19 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("StaSSH")
         self.resize(1000, 800)
 
+        direct_connections_widget = DirectConnectionsWidget()
+
+        tabs = QTabWidget()
+        tabs.addTab(direct_connections_widget, "Direct Connections")
+
         layout = QVBoxLayout()
+        layout.addWidget(tabs)
 
         dock = QDockWidget("Log")
         log_text = QTextEdit()
         log_text.setReadOnly(True)
         log_text.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
-        # Use a fixed width font
-        log_text.setFontFamily("Consolas")
+        log_text.setFontFamily("Courier")  # Use a fixed width font
         log_handler = Logger(log_text)
         dock.setWidget(log_handler.widget)
         dock.setFeatures(
