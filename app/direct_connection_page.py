@@ -274,4 +274,4 @@ class DirectConnectionsWidget(QWidget):
     def _on_delete_direct_connection(self, row: int):
         """Delete a direct connection."""
         source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        self.model.delete_connection(source_index)
+        self.model.delete_connection(source_index.row())
