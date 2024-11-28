@@ -2,8 +2,12 @@ import logging
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
+    QDialog,
     QDockWidget,
+    QLabel,
     QMainWindow,
+    QMenu,
+    QMenuBar,
     QTabWidget,
     QTextEdit,
     QVBoxLayout,
@@ -11,6 +15,7 @@ from PyQt5.QtWidgets import (
 )
 
 from app.direct_connection_page import DirectConnectionsWidget
+from app.version import __version__
 
 
 class Logger(logging.Handler):
@@ -23,13 +28,33 @@ class Logger(logging.Handler):
         self.widget.append(msg)
 
 
-class MainWindow(QMainWindow):
+class AboutDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("StaSSH")
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
+
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel(f"Version: {__version__}"))
+        layout.addWidget(QLabel("Author: Campbell Brown"))
+
+        self.setLayout(layout)
+
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle(f"StaSSH {__version__}")
         self.resize(1000, 800)
 
         direct_connections_widget = DirectConnectionsWidget()
+
+        help_menu = QMenu("&Help", self)
+        help_menu.addAction("&About", self._on_about)
+
+        menu_bar = QMenuBar()
+        menu_bar.addMenu(help_menu)
+        self.setMenuBar(menu_bar)
 
         tabs = QTabWidget()
         tabs.addTab(direct_connections_widget, "Direct Connections")
@@ -52,9 +77,13 @@ class MainWindow(QMainWindow):
         logging.getLogger().addHandler(log_handler)
         logging.getLogger().setLevel(logging.INFO)
 
-        logging.info("Application started")
+        logging.info("v%s", __version__)
 
         central_widget = QWidget()
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, dock)
+
+    def _on_about(self):
+        about_dialog = AboutDialog()
+        about_dialog.exec_()

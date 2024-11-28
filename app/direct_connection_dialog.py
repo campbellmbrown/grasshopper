@@ -1,5 +1,6 @@
 import os
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QDialog,
     QDialogButtonBox,
@@ -23,6 +24,7 @@ class DirectConnectionDialog(QDialog):
     def __init__(self, title: str):
         super().__init__()
         self.setWindowTitle(title)
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
 
         default_direct_connection = DirectConnection.default()
         self.name_input = QLineEdit(default_direct_connection.name)

@@ -34,7 +34,7 @@ These additional properties are for personal identification:
 - **Name**
 - **Note**
 
-Direct connections are saved to `%APPDATA%/StaSSH/direct_connections.json` on Windows and `~/.config/StaSSH/connections.json` on Linux.
+Direct connections are saved to `%APPDATA%/StaSSH/direct_connections.json` on Windows.
 
 # Setup
 
