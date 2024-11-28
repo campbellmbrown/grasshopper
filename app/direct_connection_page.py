@@ -266,10 +266,13 @@ class DirectConnectionsWidget(QWidget):
     def _on_duplicate_direct_connection(self, row: int):
         """Duplicate a direct connection."""
         source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        direct_connection = self.model.get_direct_connection(source_index).copy()
+        direct_connection = self.model.get_direct_connection(source_index.row()).copy()
         direct_connection.name += " (Copy)"
-        self.model.add_direct_connection(direct_connection)
-        self._on_edit_direct_connection(self.model.direct_connections.index(direct_connection))
+        dialog = DirectConnectionDialog("New Direct Connection")
+        dialog.populate_fields(direct_connection)
+        result = dialog.exec_()
+        if result == QDialog.DialogCode.Accepted:
+            self.model.add_direct_connection(direct_connection)
 
     def _on_delete_direct_connection(self, row: int):
         """Delete a direct connection."""

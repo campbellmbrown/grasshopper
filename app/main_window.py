@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
         log_text = QTextEdit()
         log_text.setReadOnly(True)
         log_text.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
-        log_text.setFontFamily("Courier")  # Use a fixed width font
+        log_text.setFontFamily("Consolas")  # Use a fixed width font
         log_handler = Logger(log_text)
         dock.setWidget(log_handler.widget)
         dock.setFeatures(
