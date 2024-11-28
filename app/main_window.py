@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
 )
 
 from app.direct_connection_page import DirectConnectionsWidget
-from app.version import __version__
+from app.version import GIT_SHA, __version__
 
 
 class Logger(logging.Handler):
@@ -36,8 +36,8 @@ class AboutDialog(QDialog):
 
         layout = QVBoxLayout()
         layout.addWidget(QLabel(f"Version: {__version__}"))
+        layout.addWidget(QLabel(f"SHA: {GIT_SHA}"))
         layout.addWidget(QLabel("Author: Campbell Brown"))
-
         self.setLayout(layout)
 
 
