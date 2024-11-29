@@ -22,6 +22,7 @@ jobs:
 
       - name: Build windows executable
         run: |
+          wine pythom -m pip install --upgrade pip
           wine pip install -r requirements.txt
           wine pyinstaller --onefile --noconsole --add-data "resources;resources" stassh.py
 
