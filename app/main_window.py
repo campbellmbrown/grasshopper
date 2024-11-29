@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (
 
 from app.direct_connection_page import DirectConnectionsWidget
 from app.version import GIT_SHA, __version__
+from app.version_checker import GetLatestVersionThread, NewVersionDialog
 
 
 class Logger(logging.Handler):
@@ -84,6 +85,16 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, dock)
 
+        self.version_check_thread = GetLatestVersionThread()
+        self.version_check_thread.new_version_available.connect(self._on_new_version_available)
+        self.version_check_thread.start()
+
     def _on_about(self):
+        """Show the about dialog."""
         about_dialog = AboutDialog()
         about_dialog.exec_()
+
+    def _on_new_version_available(self, latest_version: str, url: str, publish_date: str):
+        """Show a dialog to inform the user that a new version is available."""
+        new_version_dialog = NewVersionDialog(latest_version, url, publish_date)
+        new_version_dialog.exec_()

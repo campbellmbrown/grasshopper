@@ -68,9 +68,9 @@ class DirectConnectionDialog(QDialog):
         keys_group_layout.addWidget(self.select_key_button)
         keys_group.setLayout(keys_group_layout)
 
-        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
-        self.buttons.accepted.connect(self.accept_if_valid)
-        self.buttons.rejected.connect(self.reject)
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(self.accept_if_valid)
+        buttons.rejected.connect(self.reject)
 
         layout = QVBoxLayout()
         layout.addWidget(details_group)
@@ -78,7 +78,7 @@ class DirectConnectionDialog(QDialog):
         layout.addWidget(keys_group)
         layout.addWidget(QLabel("Notes"))
         layout.addWidget(self.notes_input)
-        layout.addWidget(self.buttons)
+        layout.addWidget(buttons)
         self.setLayout(layout)
 
     def populate_fields(self, direct_connection: DirectConnection):
