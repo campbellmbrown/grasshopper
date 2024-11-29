@@ -1,0 +1,33 @@
+name: Build and Publish
+
+on:
+  workflow_dispatch: # Manually trigger the workflow
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Clean workspace
+        run: |
+          rm -rf dist build stassh.spec resources/GIT_SHA installer/*.exe
+
+      - name: Prepare resources
+        run: |
+          echo "${{ github.sha }}" > resources/GIT_SHA
+          cat resources/GIT_SHA
+
+      - name: Build Windows executable
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace tobix/pywine:3.12 bash -c "
+            python -m pip install --upgrade pip &&
+            pip install -r requirements.txt &&
+            pyinstaller --onefile --noconsole --add-data resources;resources stassh.py
+          "
+
+      - name: Build installer
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace amake/innosetup:innosetup6 installer/installer.iss
