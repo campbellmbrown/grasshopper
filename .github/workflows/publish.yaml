@@ -20,10 +20,13 @@ jobs:
           echo "${GITHUB_SHA}" > resources/GIT_SHA
           cat resources/GIT_SHA
 
+      - name: Install dependencies
+        run: |
+          wine python -m pip install --upgrade pip
+          wine pip install -r requirements.txt
+
       - name: Build windows executable
         run: |
-          wine pythom -m pip install --upgrade pip
-          wine pip install -r requirements.txt
           wine pyinstaller --onefile --noconsole --add-data "resources;resources" stassh.py
           ls dist
 
