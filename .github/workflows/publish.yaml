@@ -42,7 +42,7 @@ jobs:
 
     container:
       image: amake/innosetup:innosetup6
-      options: --user root
+      options: --user 1001
 
     steps:
       - name: Check out repository code
@@ -55,7 +55,6 @@ jobs:
 
       - name: Build installer
         run: |
-          sudo chown -R root:root /home/xclient/.wine
           iscc resources/installer.iss
 
       - name: Upload artifact
