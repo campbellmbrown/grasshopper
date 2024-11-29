@@ -55,6 +55,7 @@ jobs:
 
       - name: Build installer
         run: |
+          sudo chown -R root:root /home/xclient/.wine
           iscc resources/installer.iss
 
       - name: Upload artifact
