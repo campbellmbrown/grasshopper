@@ -8,17 +8,17 @@ jobs:
     name: Publish
     runs-on: ubuntu-latest
 
-    container:
-      image: tobix/pywine:3.12
+    # container:
+    #   image: tobix/pywine:3.12
 
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - name: Prepare environment
-        run: |
-          echo "${GITHUB_SHA}" > resources/GIT_SHA
-          cat resources/GIT_SHA
+      # - name: Prepare environment
+      #   run: |
+      #     echo "${GITHUB_SHA}" > resources/GIT_SHA
+      #     cat resources/GIT_SHA
 
       # - name: Install dependencies
       #   run: |
@@ -27,6 +27,7 @@ jobs:
 
       - name: Fake build windows executable
         run: |
+          mkdir -p dist
           echo "Fake build windows executable" > dist/stassh.exe
 
       # - name: Build windows executable
