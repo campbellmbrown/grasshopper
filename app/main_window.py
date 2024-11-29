@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import (
 
 from app.direct_connection_page import DirectConnectionsWidget
 from app.port_forward_page import PortForwardsWidget
+from app.proxy_jump_page import ProxyJumpsWidget
 from app.settings import Settings, SettingsDialog
 from app.version import GIT_SHA, __version__
 from app.version_checker import GetLatestVersionThread, NewVersionDialog
@@ -59,6 +60,7 @@ class MainWindow(QMainWindow):
         self.settings = Settings()
         self.settings.load()
         direct_connections_widget = DirectConnectionsWidget()
+        proxy_jumps_widget = ProxyJumpsWidget()
         port_forwards_widget = PortForwardsWidget()
 
         file_menu = QMenu("&File", self)
@@ -76,6 +78,7 @@ class MainWindow(QMainWindow):
 
         tabs = QTabWidget()
         tabs.addTab(direct_connections_widget, "Direct Connections")
+        tabs.addTab(proxy_jumps_widget, "Proxy Jumps")
         tabs.addTab(port_forwards_widget, "Port Forwards")
 
         layout = QVBoxLayout()

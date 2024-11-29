@@ -136,3 +136,77 @@ class PortForward:
         port_forward.remote_server_port = data.get("remote_server_port", port_forward.remote_server_port)
         port_forward.key = data.get("key", port_forward.key)
         return port_forward
+
+
+@dataclass
+class ProxyJump:
+    DEFAULT_TARGET_PORT = 8080
+    DEFAULT_JUMP_PORT = 22
+
+    name: str
+    notes: str
+    target_user: str
+    target_host: str
+    target_port: int
+    jump_user: str
+    jump_host: str
+    jump_port: int
+    key: str
+
+    def to_dict(self) -> dict:
+        """Convert the proxy jump to a dictionary."""
+        return {
+            "name": self.name,
+            "notes": self.notes,
+            "target_user": self.target_user,
+            "target_host": self.target_host,
+            "target_port": self.target_port,
+            "jump_user": self.jump_user,
+            "jump_host": self.jump_host,
+            "jump_port": self.jump_port,
+            "key": self.key,
+        }
+
+    def copy(self) -> "ProxyJump":
+        """Create a copy of the proxy jump."""
+        return ProxyJump(
+            name=self.name,
+            notes=self.notes,
+            target_user=self.target_user,
+            target_host=self.target_host,
+            target_port=self.target_port,
+            jump_user=self.jump_user,
+            jump_host=self.jump_host,
+            jump_port=self.jump_port,
+            key=self.key,
+        )
+
+    @staticmethod
+    def default() -> "ProxyJump":
+        """Get a proxy jump containing default values."""
+        return ProxyJump(
+            name="",
+            notes="",
+            target_user="",
+            target_host="",
+            target_port=ProxyJump.DEFAULT_TARGET_PORT,
+            jump_user="",
+            jump_host="",
+            jump_port=ProxyJump.DEFAULT_JUMP_PORT,
+            key="",
+        )
+
+    @staticmethod
+    def from_dict(data: dict) -> "ProxyJump":
+        """Create a proxy jump from a dictionary. If a key is not present, the default value will be used."""
+        proxy_jump = ProxyJump.default()
+        proxy_jump.name = data.get("name", proxy_jump.name)
+        proxy_jump.notes = data.get("notes", proxy_jump.notes)
+        proxy_jump.target_user = data.get("target_user", proxy_jump.target_user)
+        proxy_jump.target_host = data.get("target_host", proxy_jump.target_host)
+        proxy_jump.target_port = data.get("target_port", proxy_jump.target_port)
+        proxy_jump.jump_user = data.get("jump_user", proxy_jump.jump_user)
+        proxy_jump.jump_host = data.get("jump_host", proxy_jump.jump_host)
+        proxy_jump.jump_port = data.get("jump_port", proxy_jump.jump_port)
+        proxy_jump.key = data.get("key", proxy_jump.key)
+        return proxy_jump
