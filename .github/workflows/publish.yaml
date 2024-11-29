@@ -23,9 +23,8 @@ jobs:
       - name: Build Windows executable
         run: |
           docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace tobix/pywine:3.12 bash -c "
-            python -m pip install --upgrade pip &&
-            pip install -r requirements.txt &&
-            pyinstaller --onefile --noconsole --add-data resources;resources stassh.py
+            wine pip install -r requirements.txt &&
+            wine pyinstaller --onefile --noconsole --add-data resources;resources stassh.py
           "
 
       - name: Build installer
