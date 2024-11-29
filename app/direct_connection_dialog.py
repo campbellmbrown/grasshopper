@@ -69,7 +69,7 @@ class DirectConnectionDialog(QDialog):
         keys_group.setLayout(keys_group_layout)
 
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
-        buttons.accepted.connect(self.accept_if_valid)
+        buttons.accepted.connect(self._accept_if_valid)
         buttons.rejected.connect(self.reject)
 
         layout = QVBoxLayout()
@@ -99,7 +99,7 @@ class DirectConnectionDialog(QDialog):
             notes=self.notes_input.toPlainText(),
         )
 
-    def accept_if_valid(self):
+    def _accept_if_valid(self):
         error_message = ""
         if not self.name_input.text():
             error_message += "Name is required\n"

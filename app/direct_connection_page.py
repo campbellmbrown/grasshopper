@@ -71,7 +71,7 @@ class DirectConnectionsModel(QAbstractTableModel):
         self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
         self._save()
 
-    def delete_connection(self, row: int) -> None:
+    def delete_direct_connection(self, row: int) -> None:
         """Delete a direct connection from the model.
 
         Args:
@@ -88,7 +88,6 @@ class DirectConnectionsModel(QAbstractTableModel):
 
     def update_direct_connection(self, row: int, direct_connection: DirectConnection) -> None:
         """Update a direct connection in the model."""
-
         self.direct_connections[row] = direct_connection
         self._save()
         self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
@@ -161,7 +160,6 @@ class DirectConnectionsModel(QAbstractTableModel):
         if not os.path.exists(DIRECT_CONNECTIONS_PATH):
             os.makedirs(os.path.dirname(DIRECT_CONNECTIONS_PATH), exist_ok=True)
         with open(DIRECT_CONNECTIONS_PATH, "w") as file:
-            # json.dump([conn.to_dict() for conn in self.direct_connections], file, indent=4)
             json.dump({"direct_connections": [conn.to_dict() for conn in self.direct_connections]}, file, indent=4)
 
 
@@ -184,7 +182,7 @@ class DirectConnectionsView(ViewBase):
         self.menu.addAction(self.duplicate_action)
         self.menu.addAction(self.delete_action)
 
-        self.new_action.triggered.connect(self.new_direct_connection.emit)
+        self.new_action.triggered.connect(self.new_direct_connection)
         self.edit_action.triggered.connect(lambda: self.edit_direct_connection.emit(self.currentIndex().row()))
         self.duplicate_action.triggered.connect(
             lambda: self.duplicate_direct_connection.emit(self.currentIndex().row())
@@ -249,14 +247,14 @@ class DirectConnectionsWidget(QWidget):
         subprocess.Popen(["start", "cmd", "/k", command], shell=True)
 
     def _on_new_direct_connection(self):
-        """Open the new direct connection dialog."""
+        """Open a new direct connection dialog."""
         dialog = DirectConnectionDialog("New Direct Connection")
         result = dialog.exec_()
         if result == QDialog.DialogCode.Accepted:
             self.model.add_direct_connection(dialog.to_direct_connection())
 
     def _on_edit_direct_connection(self, row: int):
-        """Open the edit direct connection dialog."""
+        """Open an edit direct connection dialog."""
         source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
         direct_connection = self.model.get_direct_connection(source_index.row())
 
@@ -267,7 +265,7 @@ class DirectConnectionsWidget(QWidget):
             self.model.update_direct_connection(source_index.row(), dialog.to_direct_connection())
 
     def _on_duplicate_direct_connection(self, row: int):
-        """Duplicate a direct connection."""
+        """Duplicate a direct connection into a new direct connection dialog."""
         source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
         direct_connection = self.model.get_direct_connection(source_index.row()).copy()
         direct_connection.name += " (Copy)"
@@ -280,4 +278,4 @@ class DirectConnectionsWidget(QWidget):
     def _on_delete_direct_connection(self, row: int):
         """Delete a direct connection."""
         source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        self.model.delete_connection(source_index.row())
+        self.model.delete_direct_connection(source_index.row())

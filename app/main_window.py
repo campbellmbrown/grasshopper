@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (
 )
 
 from app.direct_connection_page import DirectConnectionsWidget
+from app.port_forward_page import PortForwardsWidget
 from app.settings import Settings, SettingsDialog
 from app.version import GIT_SHA, __version__
 from app.version_checker import GetLatestVersionThread, NewVersionDialog
@@ -58,6 +59,7 @@ class MainWindow(QMainWindow):
         self.settings = Settings()
         self.settings.load()
         direct_connections_widget = DirectConnectionsWidget()
+        port_forwards_widget = PortForwardsWidget()
 
         file_menu = QMenu("&File", self)
         file_menu.addAction("&Settings", self._on_open_settings)
@@ -74,6 +76,7 @@ class MainWindow(QMainWindow):
 
         tabs = QTabWidget()
         tabs.addTab(direct_connections_widget, "Direct Connections")
+        tabs.addTab(port_forwards_widget, "Port Forwards")
 
         layout = QVBoxLayout()
         layout.addWidget(tabs)
