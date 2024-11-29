@@ -1,6 +1,6 @@
 import logging
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QObject, Qt, pyqtSignal
 from PyQt5.QtWidgets import (
     QDialog,
     QDockWidget,
@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QMenu,
     QMenuBar,
+    QPlainTextEdit,
     QTabWidget,
     QTextEdit,
     QVBoxLayout,
@@ -19,14 +20,19 @@ from app.version import GIT_SHA, __version__
 from app.version_checker import GetLatestVersionThread, NewVersionDialog
 
 
-class Logger(logging.Handler):
-    def __init__(self, widget: QTextEdit):
+class Logger(logging.Handler, QObject):
+    append_to_widget = pyqtSignal(str)
+
+    def __init__(self, parent):
         super().__init__()
-        self.widget = widget
+        QObject.__init__(self)
+        self.widget = QPlainTextEdit(parent)
+        self.widget.setReadOnly(True)
+        self.append_to_widget.connect(self.widget.appendPlainText)
 
     def emit(self, record):
         msg = self.format(record)
-        self.widget.append(msg)
+        self.append_to_widget.emit(msg)
 
 
 class AboutDialog(QDialog):
