@@ -1,0 +1,34 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "run",
+            "type": "shell",
+            "group": "build",
+            "command": "python stassh.py"
+        },
+        {
+            "label": "publish",
+            "type": "shell",
+            "group": "build",
+            "command": "sh sh/publish.sh"
+        },
+        {
+            "label": "compile installer",
+            "type": "shell",
+            "group": "build",
+            "command": "rm -rf installer/*.exe && docker run --rm -v .:/work amake/innosetup:innosetup6 installer/installer.iss"
+        },
+        {
+            "label": "publish & compile installer",
+            "group": "build",
+            "dependsOn": [
+                "publish",
+                "compile installer"
+            ],
+            "dependsOrder": "sequence"
+        }
+    ]
+}

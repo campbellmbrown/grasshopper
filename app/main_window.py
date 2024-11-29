@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (
 )
 
 from app.direct_connection_page import DirectConnectionsWidget
+from app.settings import Settings, SettingsDialog
 from app.version import GIT_SHA, __version__
 from app.version_checker import GetLatestVersionThread, NewVersionDialog
 
@@ -54,12 +55,20 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(f"StaSSH {__version__}")
         self.resize(1000, 800)
 
+        self.settings = Settings()
+        self.settings.load()
         direct_connections_widget = DirectConnectionsWidget()
+
+        file_menu = QMenu("&File", self)
+        file_menu.addAction("&Settings", self._on_open_settings)
+        file_menu.addSeparator()
+        file_menu.addAction("E&xit", self.close)
 
         help_menu = QMenu("&Help", self)
         help_menu.addAction("&About", self._on_about)
 
         menu_bar = QMenuBar()
+        menu_bar.addMenu(file_menu)
         menu_bar.addMenu(help_menu)
         self.setMenuBar(menu_bar)
 
@@ -95,6 +104,14 @@ class MainWindow(QMainWindow):
         self.version_check_thread.new_version_available.connect(self._on_new_version_available)
         self.version_check_thread.start()
 
+    def _on_open_settings(self):
+        """Show the settings dialog."""
+        settings_dialog = SettingsDialog(self.settings)
+        result = settings_dialog.exec_()
+        if result == QDialog.DialogCode.Accepted:
+            self.settings = settings_dialog.to_settings()
+            self.settings.save()
+
     def _on_about(self):
         """Show the about dialog."""
         about_dialog = AboutDialog()
@@ -102,5 +119,6 @@ class MainWindow(QMainWindow):
 
     def _on_new_version_available(self, latest_version: str, url: str, publish_date: str):
         """Show a dialog to inform the user that a new version is available."""
-        new_version_dialog = NewVersionDialog(latest_version, url, publish_date)
-        new_version_dialog.exec_()
+        if self.settings.prompt_to_download_new_version:
+            new_version_dialog = NewVersionDialog(self.settings, latest_version, url, publish_date)
+            new_version_dialog.exec_()

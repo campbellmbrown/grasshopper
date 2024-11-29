@@ -56,7 +56,7 @@ class DirectConnectionsModel(QAbstractTableModel):
             DirectConnectionsHeader.KEY: "Key",
         }
         assert len(self.headers) == len(DirectConnectionsHeader)
-        self.load()
+        self._load()
 
     def add_direct_connection(self, direct_connection: DirectConnection) -> None:
         """Add a direct connection to the model.
@@ -69,7 +69,7 @@ class DirectConnectionsModel(QAbstractTableModel):
         self.direct_connections.append(direct_connection)
         self.endInsertRows()
         self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
-        self.save()
+        self._save()
 
     def delete_connection(self, row: int) -> None:
         """Delete a direct connection from the model.
@@ -80,7 +80,7 @@ class DirectConnectionsModel(QAbstractTableModel):
         self.beginRemoveRows(QModelIndex(), row, row)
         self.direct_connections.pop(row)
         self.endRemoveRows()
-        self.save()
+        self._save()
 
     def get_direct_connection(self, row: int) -> DirectConnection:
         """Get a direct connection from the model by row."""
@@ -90,7 +90,7 @@ class DirectConnectionsModel(QAbstractTableModel):
         """Update a direct connection in the model."""
 
         self.direct_connections[row] = direct_connection
-        self.save()
+        self._save()
         self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
 
     def rowCount(self, parent: QModelIndex) -> int:
@@ -144,7 +144,7 @@ class DirectConnectionsModel(QAbstractTableModel):
                 font.setBold(True)
                 return font
 
-    def load(self):
+    def _load(self):
         if not os.path.exists(DIRECT_CONNECTIONS_PATH):
             return
         with open(DIRECT_CONNECTIONS_PATH) as file:
@@ -153,7 +153,7 @@ class DirectConnectionsModel(QAbstractTableModel):
                 for connection in loaded_direct_connections:
                     self.direct_connections.append(DirectConnection.from_dict(connection))
 
-    def save(self):
+    def _save(self):
         if not os.path.exists(DIRECT_CONNECTIONS_PATH):
             os.makedirs(os.path.dirname(DIRECT_CONNECTIONS_PATH), exist_ok=True)
         with open(DIRECT_CONNECTIONS_PATH, "w") as file:

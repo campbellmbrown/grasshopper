@@ -2,8 +2,16 @@ import logging
 
 import requests
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QLabel,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+)
 
+from app.settings import Settings
 from app.utility.semver import SemVer
 from app.version import __version__
 
@@ -11,8 +19,9 @@ from app.version import __version__
 class NewVersionDialog(QDialog):
     """Dialog to inform the user that a new version is available, presenting them with a link to download it."""
 
-    def __init__(self, latest_version: str, url: str, publish_date: str):
+    def __init__(self, settings: Settings, latest_version: str, url: str, publish_date: str):
         super().__init__()
+        self.settings = settings
         self.setWindowTitle("New Version Available")
         self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
 
@@ -24,7 +33,11 @@ class NewVersionDialog(QDialog):
         )
         label.setOpenExternalLinks(True)
 
-        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Cancel)
+        dont_ask_again_button = QPushButton("Don't ask again")
+        dont_ask_again_button.clicked.connect(self._on_dont_ask_again)
+        buttons = QDialogButtonBox()
+        buttons.addButton(dont_ask_again_button, QDialogButtonBox.ButtonRole.ActionRole)
+        buttons.addButton(QDialogButtonBox.StandardButton.Cancel)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
@@ -32,6 +45,15 @@ class NewVersionDialog(QDialog):
         layout.addWidget(label)
         layout.addWidget(buttons)
         self.setLayout(layout)
+
+    def _on_dont_ask_again(self):
+        self.settings.set_prompt_to_download_new_version(False)
+        QMessageBox.information(
+            self,
+            "Preferences Updated",
+            "The prompt to download new versions has been disabled. This can be re-enabled in the settings.",
+        )
+        self.reject()
 
 
 class GetLatestVersionThread(QThread):
@@ -70,6 +92,7 @@ class GetLatestVersionThread(QThread):
 
         if latest_version > this_version:
             logging.info("New version available: %s", tag_name)
+            logging.info("Download at: %s", latest_release["html_url"])
             self.new_version_available.emit(tag_name, latest_release["html_url"], latest_release["published_at"])
         else:
             logging.info("No new version available.")
