@@ -58,11 +58,23 @@ You can also run the application from VS Code by running the `StaSSH` configurat
 
 # Publishing
 
+## Build the Executable
+
 Build into a single executable without the console using PyInstaller:
 
 ```bash
-rm -rf dist build stassh.spec
-pyinstaller --onefile --noconsole --add-data "VERSION;." stassh.py
+sh sh/publish.sh
 ```
 
 The ``stassh.exe`` file will be in the ``dist`` directory.
+
+# Build the Installer
+
+Remove all executables in the ``installer`` directory:
+
+Build the installer using Docker:
+
+```bash
+rm installer/*.exe
+docker run --rm -i -v .:/work amake/innosetup:innosetup6 installer/installer.iss
+```
