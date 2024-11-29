@@ -47,9 +47,12 @@ jobs:
 
     container:
       image: amake/innosetup:innosetup6
-      options: --user xclient
 
     steps:
+      - name: Adjust permissions
+        run: |
+          sudo chown -r xclient:xusers /_w /_w/_temp /_w/_actions
+
       - name: Check out repository code
         uses: actions/checkout@v4
 
