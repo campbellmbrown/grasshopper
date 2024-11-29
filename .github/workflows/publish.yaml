@@ -27,7 +27,7 @@ jobs:
 
       - name: Build windows executable
         run: |
-          wine pyinstaller --onefile --noconsole --add-data --upx-exclude python3.dll "resources;resources" stassh.py
+          wine pyinstaller --onefile --noconsole --upx-exclude python3.dll --add-data "resources;resources" stassh.py
           ls dist
 
       - name: Upload artifact
