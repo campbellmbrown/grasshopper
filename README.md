@@ -60,6 +60,9 @@ You can also run the application from VS Code by running the `StaSSH` configurat
 
 ## Build the Executable
 
+> [!IMPORTANT]
+> Building the executable is done locally for now using Python 3.13.0.
+
 Build into a single executable without the console using PyInstaller:
 
 ```bash
@@ -75,6 +78,6 @@ Remove all executables in the ``installer`` directory:
 Build the installer using Docker:
 
 ```bash
-rm installer/*.exe
-docker run --rm -i -v .:/work amake/innosetup:innosetup6 installer/installer.iss
+rm -rf installer/*.exe
+docker run --rm -v .:/work amake/innosetup:innosetup6 installer/installer.iss
 ```
