@@ -1,10 +1,10 @@
+import json
 import logging
 import os
 import subprocess
 from enum import IntEnum
 from typing import Any
 
-import yaml
 from PyQt5.QtCore import (
     QAbstractTableModel,
     QModelIndex,
@@ -28,7 +28,7 @@ from app.common import ViewBase
 from app.connection import DirectConnection
 from app.direct_connection_dialog import DirectConnectionDialog
 
-DIRECT_CONNECTIONS_PATH = os.path.join(os.environ["APPDATA"], "StaSSH", "direct_connections.yaml")
+DIRECT_CONNECTIONS_PATH = os.path.join(os.environ["APPDATA"], "StaSSH", "direct_connections.json")
 
 
 class DirectConnectionsHeader(IntEnum):
@@ -148,16 +148,21 @@ class DirectConnectionsModel(QAbstractTableModel):
         if not os.path.exists(DIRECT_CONNECTIONS_PATH):
             return
         with open(DIRECT_CONNECTIONS_PATH) as file:
-            loaded_direct_connections = yaml.safe_load(file)
-            if loaded_direct_connections is not None:
-                for connection in loaded_direct_connections:
+            try:
+                loaded_direct_connections = json.load(file)
+            except json.JSONDecodeError:
+                loaded_direct_connections = None
+            if loaded_direct_connections is not None and "direct_connections" in loaded_direct_connections:
+                direct_connections = loaded_direct_connections["direct_connections"]
+                for connection in direct_connections:
                     self.direct_connections.append(DirectConnection.from_dict(connection))
 
     def _save(self):
         if not os.path.exists(DIRECT_CONNECTIONS_PATH):
             os.makedirs(os.path.dirname(DIRECT_CONNECTIONS_PATH), exist_ok=True)
         with open(DIRECT_CONNECTIONS_PATH, "w") as file:
-            yaml.dump([conn.to_dict() for conn in self.direct_connections], file)
+            # json.dump([conn.to_dict() for conn in self.direct_connections], file, indent=4)
+            json.dump({"direct_connections": [conn.to_dict() for conn in self.direct_connections]}, file, indent=4)
 
 
 class DirectConnectionsView(ViewBase):
