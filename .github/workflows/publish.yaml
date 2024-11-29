@@ -15,7 +15,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - name: Prepare environment (write Git SHA to file)
+      - name: Prepare environment
         run: |
           echo "${GITHUB_SHA}" > resources/GIT_SHA
           cat resources/GIT_SHA
@@ -27,13 +27,13 @@ jobs:
 
       - name: Build windows executable
         run: |
-          wine pyinstaller --onefile --noconsole --add-data "resources;resources" stassh.py
+          wine pyinstaller --onefile --noconsole --add-data --upx-exclude python3.dll "resources;resources" stassh.py
           ls dist
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist/stassh.exe
+          path: dist/stassh.exe
           retention-days: 1
 
   installer:
