@@ -42,6 +42,7 @@ jobs:
 
     container:
       image: amake/innosetup:innosetup6
+      options: --user root
 
     steps:
       - name: Check out repository code
