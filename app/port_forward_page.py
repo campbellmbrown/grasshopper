@@ -264,10 +264,11 @@ class PortForwardsWidget(QWidget):
     def _on_row_double_clicked(self, index: QModelIndex):
         """Open a new terminal window and connect to the host."""
         source_index = self.proxy_model.mapToSource(index)
-        conn = self.model.get_port_forward(source_index.row())
+        pf = self.model.get_port_forward(source_index.row())
 
-        key_arg = f"-i {conn.key}" if conn.key else ""
-        command = f"ssh {key_arg} {conn.user}@{conn.host} -p{conn.port}"
+        key_arg = f"-i {pf.key}" if pf.key else ""
+        remote_server_arg = f"{pf.remote_server_user}@{pf.remote_server_host} -p{pf.remote_server_port}"
+        command = f"ssh -N -L {pf.local_port}:{pf.target_host}:{pf.target_port} {remote_server_arg} {key_arg}"
         logging.info(f"Running: {command}")
         subprocess.Popen(["start", "cmd", "/k", command], shell=True)
 
