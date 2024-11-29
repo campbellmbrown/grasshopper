@@ -5,20 +5,12 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt5.QtCore import (
-    QAbstractTableModel,
-    QModelIndex,
-    QSortFilterProxyModel,
-    Qt,
-    pyqtSignal,
-)
-from PyQt5.QtGui import QContextMenuEvent, QFont
+from PyQt5.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyModel, Qt
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
-    QAction,
     QDialog,
     QHBoxLayout,
     QHeaderView,
-    QMenu,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -182,28 +174,8 @@ class PortForwardsModel(QAbstractTableModel):
 
 
 class PortForwardsView(ViewBase):
-    new_port_forward = pyqtSignal()
-    edit_port_forward = pyqtSignal(int)
-    duplicate_port_forward = pyqtSignal(int)
-    delete_port_forward = pyqtSignal(int)
-
     def __init__(self):
         super().__init__()
-
-        self.new_action = QAction("New")
-        self.edit_action = QAction("Edit")
-        self.duplicate_action = QAction("Duplicate")
-        self.delete_action = QAction("Delete")
-        self.menu = QMenu()
-        self.menu.addAction(self.new_action)
-        self.menu.addAction(self.edit_action)
-        self.menu.addAction(self.duplicate_action)
-        self.menu.addAction(self.delete_action)
-
-        self.new_action.triggered.connect(self.new_port_forward)
-        self.edit_action.triggered.connect(lambda: self.edit_port_forward.emit(self.currentIndex().row()))
-        self.duplicate_action.triggered.connect(lambda: self.duplicate_port_forward.emit(self.currentIndex().row()))
-        self.delete_action.triggered.connect(lambda: self.delete_port_forward.emit(self.currentIndex().row()))
 
     def attach_model(self, proxy_model: QSortFilterProxyModel) -> None:
         self.setModel(proxy_model)
@@ -224,14 +196,6 @@ class PortForwardsView(ViewBase):
         )
         header.setSectionResizeMode(PortForwardsHeader.KEY.value, QHeaderView.ResizeMode.ResizeToContents)
 
-    def contextMenuEvent(self, event: QContextMenuEvent) -> None:
-        index = self.indexAt(event.pos())
-        is_valid = index.isValid()
-        self.edit_action.setEnabled(is_valid)
-        self.duplicate_action.setEnabled(is_valid)
-        self.delete_action.setEnabled(is_valid)
-        self.menu.exec_(event.globalPos())
-
 
 class PortForwardsWidget(QWidget):
     def __init__(self):
@@ -244,10 +208,10 @@ class PortForwardsWidget(QWidget):
         self.proxy_model.setSourceModel(self.model)
         view.attach_model(self.proxy_model)
         view.doubleClicked.connect(self._on_row_double_clicked)
-        view.new_port_forward.connect(self._on_new_port_forward)
-        view.edit_port_forward.connect(self._on_edit_port_forward)
-        view.duplicate_port_forward.connect(self._on_duplicate_port_forward)
-        view.delete_port_forward.connect(self._on_delete_port_forward)
+        view.new_item.connect(self._on_new_port_forward)
+        view.edit_item.connect(self._on_edit_port_forward)
+        view.duplicate_item.connect(self._on_duplicate_port_forward)
+        view.delete_item.connect(self._on_delete_port_forward)
 
         new_button = QPushButton("New")
         new_button.clicked.connect(self._on_new_port_forward)

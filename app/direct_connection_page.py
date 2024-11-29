@@ -5,20 +5,12 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt5.QtCore import (
-    QAbstractTableModel,
-    QModelIndex,
-    QSortFilterProxyModel,
-    Qt,
-    pyqtSignal,
-)
-from PyQt5.QtGui import QContextMenuEvent, QFont
+from PyQt5.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyModel, Qt
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
-    QAction,
     QDialog,
     QHBoxLayout,
     QHeaderView,
-    QMenu,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -164,30 +156,8 @@ class DirectConnectionsModel(QAbstractTableModel):
 
 
 class DirectConnectionsView(ViewBase):
-    new_direct_connection = pyqtSignal()
-    edit_direct_connection = pyqtSignal(int)
-    duplicate_direct_connection = pyqtSignal(int)
-    delete_direct_connection = pyqtSignal(int)
-
     def __init__(self):
         super().__init__()
-
-        self.new_action = QAction("New")
-        self.edit_action = QAction("Edit")
-        self.duplicate_action = QAction("Duplicate")
-        self.delete_action = QAction("Delete")
-        self.menu = QMenu(self)
-        self.menu.addAction(self.new_action)
-        self.menu.addAction(self.edit_action)
-        self.menu.addAction(self.duplicate_action)
-        self.menu.addAction(self.delete_action)
-
-        self.new_action.triggered.connect(self.new_direct_connection)
-        self.edit_action.triggered.connect(lambda: self.edit_direct_connection.emit(self.currentIndex().row()))
-        self.duplicate_action.triggered.connect(
-            lambda: self.duplicate_direct_connection.emit(self.currentIndex().row())
-        )
-        self.delete_action.triggered.connect(lambda: self.delete_direct_connection.emit(self.currentIndex().row()))
 
     def attach_model(self, proxy_model: QSortFilterProxyModel) -> None:
         self.setModel(proxy_model)
@@ -198,14 +168,6 @@ class DirectConnectionsView(ViewBase):
         header.setSectionResizeMode(DirectConnectionsHeader.HOST.value, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(DirectConnectionsHeader.PORT.value, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(DirectConnectionsHeader.KEY.value, QHeaderView.ResizeMode.ResizeToContents)
-
-    def contextMenuEvent(self, event: QContextMenuEvent) -> None:
-        index = self.indexAt(event.pos())
-        is_valid = index.isValid()
-        self.edit_action.setEnabled(is_valid)
-        self.duplicate_action.setEnabled(is_valid)
-        self.delete_action.setEnabled(is_valid)
-        self.menu.exec_(event.globalPos())
 
 
 class DirectConnectionsWidget(QWidget):
@@ -219,10 +181,10 @@ class DirectConnectionsWidget(QWidget):
         self.proxy_model.setSourceModel(self.model)
         view.attach_model(self.proxy_model)
         view.doubleClicked.connect(self._on_row_double_clicked)
-        view.new_direct_connection.connect(self._on_new_direct_connection)
-        view.edit_direct_connection.connect(self._on_edit_direct_connection)
-        view.duplicate_direct_connection.connect(self._on_duplicate_direct_connection)
-        view.delete_direct_connection.connect(self._on_delete_direct_connection)
+        view.new_item.connect(self._on_new_direct_connection)
+        view.edit_item.connect(self._on_edit_direct_connection)
+        view.duplicate_item.connect(self._on_duplicate_direct_connection)
+        view.delete_item.connect(self._on_delete_direct_connection)
 
         new_button = QPushButton("New")
         new_button.clicked.connect(self._on_new_direct_connection)
