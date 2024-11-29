@@ -20,14 +20,18 @@ jobs:
           echo "${GITHUB_SHA}" > resources/GIT_SHA
           cat resources/GIT_SHA
 
-      - name: Install dependencies
-        run: |
-          wine python -m pip install --upgrade pip
-          wine pip install -r requirements.txt
+      # - name: Install dependencies
+      #   run: |
+      #     wine python -m pip install --upgrade pip
+      #     wine pip install -r requirements.txt
 
-      - name: Build windows executable
+      - name: Fake build windows executable
         run: |
-          wine pyinstaller --onefile --noconsole --upx-exclude python3.dll --add-data "resources;resources" stassh.py
+          echo "Fake build windows executable" > dist/stassh.exe
+
+      # - name: Build windows executable
+      #   run: |
+      #     wine pyinstaller --onefile --noconsole --upx-exclude python3.dll --add-data "resources;resources" stassh.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -42,7 +46,7 @@ jobs:
 
     container:
       image: amake/innosetup:innosetup6
-      options: --user 1001
+      options: --user xclient
 
     steps:
       - name: Check out repository code
