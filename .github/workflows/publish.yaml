@@ -1,6 +1,10 @@
 name: Build and Publish
 
+# Manually and on pushes to main
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch: # Manually trigger the workflow
 
 jobs:
