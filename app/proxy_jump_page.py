@@ -11,12 +11,12 @@ from PyQt5.QtWidgets import (
     QDialog,
     QHBoxLayout,
     QHeaderView,
-    QPushButton,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
-from app.common import ViewBase
+from app.common import StyleSheets, ViewBase
 from app.connection import DEVICE_TYPE_ICONS, DeviceType, ProxyJump
 from app.icons import get_icon
 from app.proxy_jump_dialog import ProxyJumpDialog
@@ -212,8 +212,9 @@ class ProxyJumpsWidget(QWidget):
         view.duplicate_item.connect(self._on_duplicate_proxy_jump)
         view.delete_item.connect(self._on_delete_proxy_jump)
 
-        new_button = QPushButton("New")
-        new_button.clicked.connect(self._on_new_proxy_jump)
+        new_button = QToolButton()
+        new_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
+        new_button.setDefaultAction(view.new_action)
 
         buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(new_button)

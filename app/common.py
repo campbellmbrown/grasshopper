@@ -5,6 +5,20 @@ from PyQt5.QtWidgets import QAction, QMenu, QTableView
 from app.icons import get_icon
 
 
+class StyleSheets:
+    TRANSPARENT_TOOLBUTTON = """
+        QToolButton {
+            background-color: transparent;
+            padding: 5px;
+            border: none;
+        }
+        QToolButton:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.3);
+        }
+    """
+
+
 class ViewBase(QTableView):
     """Base class for all table views in the application."""
 

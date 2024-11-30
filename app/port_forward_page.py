@@ -11,12 +11,12 @@ from PyQt5.QtWidgets import (
     QDialog,
     QHBoxLayout,
     QHeaderView,
-    QPushButton,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
-from app.common import ViewBase
+from app.common import StyleSheets, ViewBase
 from app.connection import PortForward
 from app.port_forward_dialog import PortForwardDialog
 
@@ -213,8 +213,9 @@ class PortForwardsWidget(QWidget):
         view.duplicate_item.connect(self._on_duplicate_port_forward)
         view.delete_item.connect(self._on_delete_port_forward)
 
-        new_button = QPushButton("New")
-        new_button.clicked.connect(self._on_new_port_forward)
+        new_button = QToolButton()
+        new_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
+        new_button.setDefaultAction(view.new_action)
 
         buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(new_button)
