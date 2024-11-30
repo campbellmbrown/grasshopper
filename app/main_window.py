@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (
 )
 
 from app.direct_connection_page import DirectConnectionsWidget
+from app.icons import get_icon
 from app.port_forward_page import PortForwardsWidget
 from app.proxy_jump_page import ProxyJumpsWidget
 from app.settings import Settings, SettingsDialog
@@ -64,12 +65,12 @@ class MainWindow(QMainWindow):
         port_forwards_widget = PortForwardsWidget()
 
         file_menu = QMenu("&File", self)
-        file_menu.addAction("&Settings", self._on_open_settings)
+        file_menu.addAction(get_icon("gear.png"), "&Settings", self._on_open_settings)
         file_menu.addSeparator()
-        file_menu.addAction("E&xit", self.close)
+        file_menu.addAction(get_icon("exit.png"), "E&xit", self.close)
 
         help_menu = QMenu("&Help", self)
-        help_menu.addAction("&About", self._on_about)
+        help_menu.addAction(get_icon("question.png"), "&About", self._on_about)
 
         menu_bar = QMenuBar()
         menu_bar.addMenu(file_menu)
