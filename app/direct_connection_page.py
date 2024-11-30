@@ -17,8 +17,9 @@ from PyQt5.QtWidgets import (
 )
 
 from app.common import ViewBase
-from app.connection import DirectConnection
+from app.connection import DEVICE_TYPE_ICONS, DeviceType, DirectConnection
 from app.direct_connection_dialog import DirectConnectionDialog
+from app.icons import get_icon
 
 DIRECT_CONNECTIONS_PATH = os.path.join(os.environ["APPDATA"], "StaSSH", "direct_connections.json")
 
@@ -96,6 +97,10 @@ class DirectConnectionsModel(QAbstractTableModel):
 
         col = index.column()
         row = index.row()
+
+        if role == Qt.ItemDataRole.DecorationRole:
+            if col == DirectConnectionsHeader.NAME:
+                return get_icon(DEVICE_TYPE_ICONS[DeviceType(self.direct_connections[row].device_type)])
 
         if role == Qt.ItemDataRole.DisplayRole:  # What's displayed to the user
             if col == DirectConnectionsHeader.NAME:

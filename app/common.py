@@ -1,6 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QIcon
+from PyQt5.QtGui import QContextMenuEvent
 from PyQt5.QtWidgets import QAction, QMenu, QTableView
+
+from app.icons import get_icon
 
 
 class ViewBase(QTableView):
@@ -19,10 +21,10 @@ class ViewBase(QTableView):
         self.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
         self.setSortingEnabled(True)
 
-        self.new_action = QAction(QIcon("resources/new.png"), "New")
-        self.edit_action = QAction(QIcon("resources/pencil.png"), "Edit")
-        self.duplicate_action = QAction(QIcon("resources/duplicate.png"), "Duplicate")
-        self.delete_action = QAction(QIcon("resources/x.png"), "Delete")
+        self.new_action = QAction(get_icon("new.png"), "New")
+        self.edit_action = QAction(get_icon("pencil.png"), "Edit")
+        self.duplicate_action = QAction(get_icon("duplicate.png"), "Duplicate")
+        self.delete_action = QAction(get_icon("x.png"), "Delete")
         self.menu = QMenu(self)
         self.menu.addAction(self.new_action)
         self.menu.addAction(self.edit_action)

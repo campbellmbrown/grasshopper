@@ -2,6 +2,7 @@ import os
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
+    QComboBox,
     QDialog,
     QDialogButtonBox,
     QFileDialog,
@@ -17,7 +18,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
 )
 
-from app.connection import DirectConnection
+from app.connection import DEVICE_TYPE_ICONS, DeviceType, DirectConnection
+from app.icons import get_icon
 
 
 class DirectConnectionDialog(QDialog):
@@ -27,6 +29,9 @@ class DirectConnectionDialog(QDialog):
         self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
 
         default_direct_connection = DirectConnection.default()
+        self.device_type_combo_box = QComboBox()
+        for device_type in DeviceType:
+            self.device_type_combo_box.addItem(get_icon(DEVICE_TYPE_ICONS[device_type]), device_type)
         self.name_input = QLineEdit(default_direct_connection.name)
         self.user_input = QLineEdit(default_direct_connection.user)
         self.user_input.setFixedWidth(80)
@@ -41,9 +46,11 @@ class DirectConnectionDialog(QDialog):
         self.notes_input = QTextEdit(default_direct_connection.notes)
 
         details_group = QGroupBox("Details")
-        details_group_layout = QVBoxLayout()
-        details_group_layout.addWidget(QLabel("Name"))
-        details_group_layout.addWidget(self.name_input)
+        details_group_layout = QGridLayout()
+        details_group_layout.addWidget(QLabel("Device Type"), 0, 0)
+        details_group_layout.addWidget(QLabel("Name"), 0, 1)
+        details_group_layout.addWidget(self.device_type_combo_box, 1, 0)
+        details_group_layout.addWidget(self.name_input, 1, 1)
         details_group.setLayout(details_group_layout)
 
         connection_group = QGroupBox("Connection")
@@ -86,6 +93,7 @@ class DirectConnectionDialog(QDialog):
 
     def to_direct_connection(self) -> DirectConnection:
         return DirectConnection(
+            device_type=self.device_type_combo_box.currentText(),
             name=self.name_input.text(),
             user=self.user_input.text(),
             host=self.host_input.text(),

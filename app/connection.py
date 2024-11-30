@@ -1,4 +1,18 @@
 from dataclasses import dataclass
+from enum import Enum
+
+
+class DeviceType(str, Enum):
+    SERVER = "Server"
+    RASPBERRY_PI = "Raspberry Pi"
+    COMPUTER = "Computer"
+
+
+DEVICE_TYPE_ICONS = {
+    DeviceType.SERVER: "server.png",
+    DeviceType.RASPBERRY_PI: "rpi.png",
+    DeviceType.COMPUTER: "laptop.png",
+}
 
 
 @dataclass
@@ -6,8 +20,9 @@ class DirectConnection:
     """A direct connection to a server using SSH."""
 
     DEFAULT_PORT = 22
-    DEFAULT_TYPE = "Server"
+    DEFAULT_DEVICE_TYPE = DeviceType.SERVER
 
+    device_type: str
     name: str
     user: str
     host: str
@@ -18,6 +33,7 @@ class DirectConnection:
     def to_dict(self) -> dict:
         """Convert the direct connection to a dictionary."""
         return {
+            "device_type": self.device_type,
             "name": self.name,
             "user": self.user,
             "host": self.host,
@@ -29,6 +45,7 @@ class DirectConnection:
     def copy(self) -> "DirectConnection":
         """Create a copy of the direct connection."""
         return DirectConnection(
+            device_type=self.device_type,
             name=self.name,
             user=self.user,
             host=self.host,
@@ -41,6 +58,7 @@ class DirectConnection:
     def default() -> "DirectConnection":
         """Get a direct connection containing default values."""
         return DirectConnection(
+            device_type=DirectConnection.DEFAULT_DEVICE_TYPE,
             name="",
             user="",
             host="",
@@ -53,6 +71,9 @@ class DirectConnection:
     def from_dict(data: dict) -> "DirectConnection":
         """Create a direct connection from a dictionary. If a key is not present, the default value will be used."""
         direct_connection = DirectConnection.default()
+        device_type = data.get("device_type")
+        if device_type is not None and device_type in DeviceType:
+            direct_connection.device_type = device_type
         direct_connection.name = data.get("name", direct_connection.name)
         direct_connection.user = data.get("user", direct_connection.user)
         direct_connection.host = data.get("host", direct_connection.host)
