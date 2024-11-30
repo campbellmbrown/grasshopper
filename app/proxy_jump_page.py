@@ -17,7 +17,8 @@ from PyQt5.QtWidgets import (
 )
 
 from app.common import ViewBase
-from app.connection import ProxyJump
+from app.connection import DEVICE_TYPE_ICONS, DeviceType, ProxyJump
+from app.icons import get_icon
 from app.proxy_jump_dialog import ProxyJumpDialog
 
 PROXY_JUMPS_PATH = os.path.join(os.environ["APPDATA"], "StaSSH", "proxy_jumps.json")
@@ -102,6 +103,10 @@ class ProxyJumpsModel(QAbstractTableModel):
 
         col = index.column()
         row = index.row()
+
+        if role == Qt.ItemDataRole.DecorationRole:
+            if col == ProxyJumpsHeader.NAME:
+                return get_icon(DEVICE_TYPE_ICONS[DeviceType(self.proxy_jumps[row].device_type)])
 
         if role == Qt.ItemDataRole.DisplayRole:  # What's displayed to the user
             if col == ProxyJumpsHeader.NAME:

@@ -2,6 +2,7 @@ import os
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
+    QComboBox,
     QDialog,
     QDialogButtonBox,
     QFileDialog,
@@ -17,7 +18,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
 )
 
-from app.connection import ProxyJump
+from app.connection import DEVICE_TYPE_ICONS, DeviceType, ProxyJump
+from app.icons import get_icon
 
 
 class ProxyJumpDialog(QDialog):
@@ -27,6 +29,9 @@ class ProxyJumpDialog(QDialog):
         self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
 
         default_proxy_jump = ProxyJump.default()
+        self.device_type_combo_box = QComboBox()
+        for device_type in DeviceType:
+            self.device_type_combo_box.addItem(get_icon(DEVICE_TYPE_ICONS[device_type]), device_type)
         self.name_input = QLineEdit(default_proxy_jump.name)
         self.target_user_input = QLineEdit(default_proxy_jump.target_user)
         self.target_user_input.setFixedWidth(80)
@@ -48,9 +53,11 @@ class ProxyJumpDialog(QDialog):
         self.notes_input = QTextEdit(default_proxy_jump.notes)
 
         details_group = QGroupBox("Details")
-        details_group_layout = QVBoxLayout()
-        details_group_layout.addWidget(QLabel("Name"))
-        details_group_layout.addWidget(self.name_input)
+        details_group_layout = QGridLayout()
+        details_group_layout.addWidget(QLabel("Device Type"), 0, 0)
+        details_group_layout.addWidget(QLabel("Name"), 0, 1)
+        details_group_layout.addWidget(self.device_type_combo_box, 1, 0)
+        details_group_layout.addWidget(self.name_input, 1, 1)
         details_group.setLayout(details_group_layout)
 
         connection_group = QGroupBox("Connection")
@@ -102,6 +109,7 @@ class ProxyJumpDialog(QDialog):
 
     def to_proxy_jump(self) -> ProxyJump:
         return ProxyJump(
+            device_type=self.device_type_combo_box.currentText(),
             name=self.name_input.text(),
             target_user=self.target_user_input.text(),
             target_host=self.target_host_input.text(),

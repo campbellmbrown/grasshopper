@@ -163,7 +163,9 @@ class PortForward:
 class ProxyJump:
     DEFAULT_TARGET_PORT = 8080
     DEFAULT_JUMP_PORT = 22
+    DEFAULT_DEVICE_TYPE = DeviceType.SERVER
 
+    device_type: str
     name: str
     notes: str
     target_user: str
@@ -177,6 +179,7 @@ class ProxyJump:
     def to_dict(self) -> dict:
         """Convert the proxy jump to a dictionary."""
         return {
+            "device_type": self.device_type,
             "name": self.name,
             "notes": self.notes,
             "target_user": self.target_user,
@@ -191,6 +194,7 @@ class ProxyJump:
     def copy(self) -> "ProxyJump":
         """Create a copy of the proxy jump."""
         return ProxyJump(
+            device_type=self.device_type,
             name=self.name,
             notes=self.notes,
             target_user=self.target_user,
@@ -206,6 +210,7 @@ class ProxyJump:
     def default() -> "ProxyJump":
         """Get a proxy jump containing default values."""
         return ProxyJump(
+            device_type=ProxyJump.DEFAULT_DEVICE_TYPE,
             name="",
             notes="",
             target_user="",
@@ -221,6 +226,9 @@ class ProxyJump:
     def from_dict(data: dict) -> "ProxyJump":
         """Create a proxy jump from a dictionary. If a key is not present, the default value will be used."""
         proxy_jump = ProxyJump.default()
+        device_type = data.get("device_type")
+        if device_type is not None and device_type in DeviceType:
+            proxy_jump.device_type = device_type
         proxy_jump.name = data.get("name", proxy_jump.name)
         proxy_jump.notes = data.get("notes", proxy_jump.notes)
         proxy_jump.target_user = data.get("target_user", proxy_jump.target_user)
