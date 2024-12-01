@@ -1,6 +1,10 @@
 # StaSSH
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/campbellmbrown/stassh)
+![License](https://img.shields.io/github/license/campbellmbrown/stassh)
+![Release](https://img.shields.io/github/v/release/campbellmbrown/stassh)
+![Contributors](https://img.shields.io/github/contributors/campbellmbrown/stassh)
+![Issues](https://img.shields.io/github/issues/campbellmbrown/stassh)
+![Pull Requests](https://img.shields.io/github/issues-pr/campbellmbrown/stassh)
 
 ```
       ___           ___           ___           ___           ___           ___
