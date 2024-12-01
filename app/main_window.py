@@ -57,6 +57,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(f"StaSSH {__version__}")
         self.resize(1000, 800)
+        self.setWindowIcon(get_icon("logo_32x32.png"))
 
         self.settings = Settings()
         self.settings.load()
