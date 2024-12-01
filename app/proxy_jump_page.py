@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QDialog,
     QHBoxLayout,
     QHeaderView,
+    QMessageBox,
     QToolButton,
     QVBoxLayout,
     QWidget,
@@ -268,5 +269,13 @@ class ProxyJumpsWidget(QWidget):
 
     def _on_delete_proxy_jump(self, row: int):
         """Delete a proxy jump."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        self.model.delete_proxy_jump(source_index.row())
+        confirmed = QMessageBox.question(
+            self,
+            "Delete Proxy Jump",
+            "Are you sure you want to delete this proxy jump?",
+            (QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No),
+            QMessageBox.StandardButton.Yes,
+        )
+        if confirmed == QMessageBox.StandardButton.Yes:
+            source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
+            self.model.delete_proxy_jump(source_index.row())

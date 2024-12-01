@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
     QDialog,
     QHBoxLayout,
     QHeaderView,
+    QMessageBox,
     QToolButton,
     QVBoxLayout,
     QWidget,
@@ -314,5 +315,13 @@ class DirectConnectionsWidget(QWidget):
 
     def _on_delete_direct_connection(self, row: int):
         """Delete a direct connection."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        self.model.delete_direct_connection(source_index.row())
+        confirmed = QMessageBox.question(
+            self,
+            "Delete Direct Connection",
+            "Are you sure you want to delete this direct connection?",
+            (QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No),
+            QMessageBox.StandardButton.Yes,
+        )
+        if confirmed == QMessageBox.StandardButton.Yes:
+            source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
+            self.model.delete_direct_connection(source_index.row())

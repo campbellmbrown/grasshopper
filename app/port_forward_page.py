@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (
     QDialog,
     QHBoxLayout,
     QHeaderView,
+    QMessageBox,
     QToolButton,
     QVBoxLayout,
     QWidget,
@@ -268,5 +269,13 @@ class PortForwardsWidget(QWidget):
 
     def _on_delete_port_forward(self, row: int):
         """Delete a port forward."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        self.model.delete_port_forward(source_index.row())
+        confirmed = QMessageBox.question(
+            self,
+            "Delete Port Forward",
+            "Are you sure you want to delete this port forward?",
+            (QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No),
+            QMessageBox.StandardButton.Yes,
+        )
+        if confirmed == QMessageBox.StandardButton.Yes:
+            source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
+            self.model.delete_port_forward(source_index.row())
