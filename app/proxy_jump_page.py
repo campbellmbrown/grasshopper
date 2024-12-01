@@ -6,7 +6,7 @@ from enum import IntEnum
 from typing import Any
 
 from PyQt5.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyModel, Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QDialog,
     QHBoxLayout,
@@ -154,10 +154,8 @@ class ProxyJumpsModel(QAbstractTableModel):
                 return self.headers[ProxyJumpsHeader(section)]
             if role == Qt.ItemDataRole.TextAlignmentRole:
                 return Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
-            if role == Qt.ItemDataRole.FontRole:
-                font = QFont()
-                font.setBold(True)
-                return font
+            if role == Qt.ItemDataRole.TextColorRole:
+                return QColor(Qt.GlobalColor.gray)
 
     def _load(self):
         if not os.path.exists(PROXY_JUMPS_PATH):
