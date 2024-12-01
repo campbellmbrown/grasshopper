@@ -8,6 +8,7 @@ from typing import Any
 from PyQt5.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyModel, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
+    QAction,
     QDialog,
     QHBoxLayout,
     QHeaderView,
@@ -218,8 +219,15 @@ class DirectConnectionsWidget(QWidget):
         new_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
         new_button.setDefaultAction(view.new_action)
 
+        refresh_connection_status_action = QAction(get_icon("reload.png"), "Refresh Connection Status")
+        refresh_connection_status_action.triggered.connect(self._on_refresh_status)
+        refresh_connection_status_button = QToolButton()
+        refresh_connection_status_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
+        refresh_connection_status_button.setDefaultAction(refresh_connection_status_action)
+
         buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(new_button)
+        buttons_layout.addWidget(refresh_connection_status_button)
         buttons_layout.addStretch()
 
         layout = QVBoxLayout()
@@ -229,6 +237,12 @@ class DirectConnectionsWidget(QWidget):
 
         self.connection_status_threads: list[ConnectionStatusThread] = []
         for connection in self.model.direct_connections:
+            self._start_connection_status_thread(connection)
+
+    def _on_refresh_status(self):
+        """Refresh all connection statuses."""
+        for connection in self.model.direct_connections:
+            self.model.new_connection_status(connection, ConnectionStatus.UNKNOWN)
             self._start_connection_status_thread(connection)
 
     def _start_connection_status_thread(self, direct_connection: DirectConnection):
