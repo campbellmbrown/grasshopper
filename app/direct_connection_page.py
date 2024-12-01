@@ -55,7 +55,7 @@ class DirectConnectionsModel(QAbstractTableModel):
             DirectConnectionsHeader.HOST: "Host Name",
             DirectConnectionsHeader.PORT: "Port",
             DirectConnectionsHeader.KEY: "Key",
-            DirectConnectionsHeader.CONNECTION_STATUS: "Connection Status",
+            DirectConnectionsHeader.CONNECTION_STATUS: "Status",
         }
         assert len(self.headers) == len(DirectConnectionsHeader)
         self._load()
@@ -131,7 +131,8 @@ class DirectConnectionsModel(QAbstractTableModel):
             if col == DirectConnectionsHeader.PORT:
                 return self.direct_connections[row].port
             if col == DirectConnectionsHeader.KEY:
-                return self.direct_connections[row].key
+                # Display the key file name only
+                return os.path.basename(self.direct_connections[row].key)
             if col == DirectConnectionsHeader.CONNECTION_STATUS:
                 return self.connection_statuses[row].value
 
