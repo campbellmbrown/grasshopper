@@ -97,6 +97,7 @@ class ProxyJumpDialog(QDialog):
         self.setLayout(layout)
 
     def populate_fields(self, proxy_jump: ProxyJump):
+        self.device_type_combo_box.setCurrentText(proxy_jump.device_type)
         self.name_input.setText(proxy_jump.name)
         self.target_user_input.setText(proxy_jump.target_user)
         self.target_host_input.setText(proxy_jump.target_host)
