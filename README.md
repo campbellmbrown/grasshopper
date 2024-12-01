@@ -37,10 +37,50 @@ Direct connections are the most simple way to connect to a server. They have the
 
 These additional properties are for personal identification:
 
+- **Device Type**
 - **Name**
-- **Note**
+- **Notes**
 
 Direct connections are saved to `%APPDATA%/StaSSH/direct_connections.json` on Windows.
+
+## Proxy Jumps
+
+Proxy jumps allow jumping through a server to reach another server. They have the following properties:
+
+- **Jump Host**: The IP address or domain name of the server to jump through.
+- **Jump Port**: The port used for the jump connection.
+- **Jump User**: The username used for the jump connection.
+- **Target Host**: The IP address or domain name of the target server.
+- **Target Port**: The port used for the target connection.
+- **Target User**: The username used for the target connection.
+- **Key**: The private key used for authentication.
+
+These additional properties are for personal identification:
+
+- **Device Type**
+- **Name**
+- **Notes**
+
+Proxy jumps are saved to `%APPDATA%/StaSSH/proxy_jumps.json` on Windows.
+
+## Port Forwarding
+
+Port forwarding allows forwarding a local port to a remote port. They have the following properties:
+
+- **Remote Server Host**: The IP address or domain name of the remote server.
+- **Remote Server Port**: The port used for the remote connection.
+- **Remote Server User**: The username used for the remote connection.
+- **Target Host**: The IP address or domain name of the target server.
+- **Target Port**: The port used for the target connection.
+- **Local Port**: The port used for the local connection.
+
+These additional properties are for personal identification:
+
+- **Device Type**
+- **Name**
+- **Notes**
+
+Port forwarding are saved to `%APPDATA%/StaSSH/port_forwards.json` on Windows.
 
 # Setup
 
