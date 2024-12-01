@@ -97,10 +97,10 @@ class DirectConnectionsModel(QAbstractTableModel):
         self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
 
     def new_connection_status(self, direct_connection: DirectConnection, status: ConnectionStatus) -> None:
-        if direct_connection in self.direct_connections:  # Guard against the connection being deleted
+        if direct_connection in self.direct_connections:  # Guard against the connection being deleted or edited
             row = self.direct_connections.index(direct_connection)
-        self.connection_statuses[row] = status
-        self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
+            self.connection_statuses[row] = status
+            self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
 
     def rowCount(self, parent: QModelIndex) -> int:
         return len(self.direct_connections)
