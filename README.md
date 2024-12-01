@@ -14,6 +14,8 @@
      \/__/                       \/__/         \/__/         \/__/         \/__/
 ```
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/campbellmbrown/stassh)
+
 StaSSH is a "stash" of your SSH connections.
 The goal is to provide a simple GUI allowing easily connections to your servers without having to remember tedious commands.
 
