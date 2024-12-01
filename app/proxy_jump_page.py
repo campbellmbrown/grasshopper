@@ -125,7 +125,8 @@ class ProxyJumpsModel(QAbstractTableModel):
             if col == ProxyJumpsHeader.JUMP_PORT:
                 return self.proxy_jumps[row].jump_port
             if col == ProxyJumpsHeader.KEY:
-                return self.proxy_jumps[row].key
+                # Display the key file name only
+                return os.path.basename(self.proxy_jumps[row].key)
 
         if role == Qt.ItemDataRole.UserRole:  # Application-specific purposes
             if col == ProxyJumpsHeader.NAME:

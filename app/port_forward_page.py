@@ -120,7 +120,8 @@ class PortForwardsModel(QAbstractTableModel):
             if col == PortForwardsHeader.REMOTE_SERVER_PORT:
                 return self.port_forwards[row].remote_server_port
             if col == PortForwardsHeader.KEY:
-                return self.port_forwards[row].key
+                # Display the key file name only
+                return os.path.basename(self.port_forwards[row].key)
 
         if role == Qt.ItemDataRole.UserRole:  # Application-specific purposes
             if col == PortForwardsHeader.NAME:
