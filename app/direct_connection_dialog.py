@@ -84,6 +84,7 @@ class DirectConnectionDialog(QDialog):
         self.setLayout(layout)
 
     def populate_fields(self, direct_connection: DirectConnection):
+        self.device_type_combo_box.setCurrentText(direct_connection.device_type)
         self.name_input.setText(direct_connection.name)
         self.user_input.setText(direct_connection.user)
         self.host_input.setText(direct_connection.host)
