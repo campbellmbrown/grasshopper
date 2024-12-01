@@ -18,6 +18,11 @@ from PyQt5.QtWidgets import (
 
 from app.common import StyleSheets, ViewBase
 from app.connection import DEVICE_TYPE_ICONS, DeviceType, DirectConnection
+from app.connection_status import (
+    CONNECTION_STATUS_ICONS,
+    ConnectionStatus,
+    ConnectionStatusThread,
+)
 from app.direct_connection_dialog import DirectConnectionDialog
 from app.icons import get_icon
 
@@ -32,14 +37,16 @@ class DirectConnectionsHeader(IntEnum):
     HOST = 2
     PORT = 3
     KEY = 4
+    CONNECTION_STATUS = 5
 
 
 class DirectConnectionsModel(QAbstractTableModel):
     """Model for the direct connections table."""
 
     def __init__(self):
-        self.direct_connections: list[DirectConnection] = []
         super().__init__()
+        self.direct_connections: list[DirectConnection] = []
+        self.connection_statuses: list[ConnectionStatus] = []
 
         self.headers = {
             DirectConnectionsHeader.NAME: "Name",
@@ -47,6 +54,7 @@ class DirectConnectionsModel(QAbstractTableModel):
             DirectConnectionsHeader.HOST: "Host Name",
             DirectConnectionsHeader.PORT: "Port",
             DirectConnectionsHeader.KEY: "Key",
+            DirectConnectionsHeader.CONNECTION_STATUS: "Connection Status",
         }
         assert len(self.headers) == len(DirectConnectionsHeader)
         self._load()
@@ -60,6 +68,7 @@ class DirectConnectionsModel(QAbstractTableModel):
         row = len(self.direct_connections)
         self.beginInsertRows(QModelIndex(), row, row)
         self.direct_connections.append(direct_connection)
+        self.connection_statuses.append(ConnectionStatus.UNKNOWN)
         self.endInsertRows()
         self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
         self._save()
@@ -72,6 +81,7 @@ class DirectConnectionsModel(QAbstractTableModel):
         """
         self.beginRemoveRows(QModelIndex(), row, row)
         self.direct_connections.pop(row)
+        self.connection_statuses.pop(row)
         self.endRemoveRows()
         self._save()
 
@@ -83,6 +93,12 @@ class DirectConnectionsModel(QAbstractTableModel):
         """Update a direct connection in the model."""
         self.direct_connections[row] = direct_connection
         self._save()
+        self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
+
+    def new_connection_status(self, direct_connection: DirectConnection, status: ConnectionStatus) -> None:
+        if direct_connection in self.direct_connections:  # Guard against the connection being deleted
+            row = self.direct_connections.index(direct_connection)
+        self.connection_statuses[row] = status
         self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
 
     def rowCount(self, parent: QModelIndex) -> int:
@@ -101,6 +117,8 @@ class DirectConnectionsModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.DecorationRole:
             if col == DirectConnectionsHeader.NAME:
                 return get_icon(DEVICE_TYPE_ICONS[DeviceType(self.direct_connections[row].device_type)])
+            if col == DirectConnectionsHeader.CONNECTION_STATUS:
+                return get_icon(CONNECTION_STATUS_ICONS[self.connection_statuses[row]])
 
         if role == Qt.ItemDataRole.DisplayRole:  # What's displayed to the user
             if col == DirectConnectionsHeader.NAME:
@@ -113,6 +131,8 @@ class DirectConnectionsModel(QAbstractTableModel):
                 return self.direct_connections[row].port
             if col == DirectConnectionsHeader.KEY:
                 return self.direct_connections[row].key
+            if col == DirectConnectionsHeader.CONNECTION_STATUS:
+                return self.connection_statuses[row].value
 
         if role == Qt.ItemDataRole.UserRole:  # Application-specific purposes
             if col == DirectConnectionsHeader.NAME:
@@ -125,6 +145,8 @@ class DirectConnectionsModel(QAbstractTableModel):
                 return self.direct_connections[row].port
             if col == DirectConnectionsHeader.KEY:
                 return self.direct_connections[row].key
+            if col == DirectConnectionsHeader.CONNECTION_STATUS:
+                return self.connection_statuses[row].value
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
@@ -152,6 +174,7 @@ class DirectConnectionsModel(QAbstractTableModel):
                 direct_connections = loaded_direct_connections["direct_connections"]
                 for connection in direct_connections:
                     self.direct_connections.append(DirectConnection.from_dict(connection))
+                    self.connection_statuses.append(ConnectionStatus.UNKNOWN)
 
     def _save(self):
         if not os.path.exists(DIRECT_CONNECTIONS_PATH):
@@ -204,6 +227,30 @@ class DirectConnectionsWidget(QWidget):
         layout.addWidget(view)
         self.setLayout(layout)
 
+        self.connection_status_threads: list[ConnectionStatusThread] = []
+        for connection in self.model.direct_connections:
+            self._start_connection_status_thread(connection)
+
+    def _start_connection_status_thread(self, direct_connection: DirectConnection):
+        """Start a thread to check the connection status of a DirectConnection."""
+        thread = ConnectionStatusThread(direct_connection)
+        thread.status_updated.connect(
+            lambda status, conn=direct_connection: self._on_connection_status_updated(status, conn)
+        )
+        thread.finished.connect(lambda: self._on_thread_finished(thread))
+        thread.start()
+        self.connection_status_threads.append(thread)
+
+    def _on_connection_status_updated(self, status: ConnectionStatus, direct_connection: DirectConnection):
+        """When a connection status thread updates the status of a DirectConnection."""
+        logging.info(f"Network check for {direct_connection.name} complete: {status.value}")
+        self.model.new_connection_status(direct_connection, status)
+
+    def _on_thread_finished(self, thread: ConnectionStatusThread):
+        """When a connection status thread finishes."""
+        self.connection_status_threads.remove(thread)
+        thread.deleteLater()
+
     def _on_row_double_clicked(self, index: QModelIndex):
         """Open a new terminal window and connect to the host."""
         source_index = self.proxy_model.mapToSource(index)
@@ -219,7 +266,9 @@ class DirectConnectionsWidget(QWidget):
         dialog = DirectConnectionDialog("New Direct Connection")
         result = dialog.exec_()
         if result == QDialog.DialogCode.Accepted:
-            self.model.add_direct_connection(dialog.to_direct_connection())
+            new_direct_connection = dialog.to_direct_connection()
+            self.model.add_direct_connection(new_direct_connection)
+            self._start_connection_status_thread(new_direct_connection)
 
     def _on_edit_direct_connection(self, row: int):
         """Open an edit direct connection dialog."""
@@ -230,7 +279,10 @@ class DirectConnectionsWidget(QWidget):
         dialog.populate_fields(direct_connection)
         result = dialog.exec_()
         if result == QDialog.DialogCode.Accepted:
+            edited_direct_connection = dialog.to_direct_connection()
             self.model.update_direct_connection(source_index.row(), dialog.to_direct_connection())
+            self.model.new_connection_status(edited_direct_connection, ConnectionStatus.UNKNOWN)
+            self._start_connection_status_thread(edited_direct_connection)
 
     def _on_duplicate_direct_connection(self, row: int):
         """Duplicate a direct connection into a new direct connection dialog."""
@@ -241,7 +293,9 @@ class DirectConnectionsWidget(QWidget):
         dialog.populate_fields(direct_connection)
         result = dialog.exec_()
         if result == QDialog.DialogCode.Accepted:
-            self.model.add_direct_connection(dialog.to_direct_connection())
+            new_direct_connection = dialog.to_direct_connection()
+            self.model.add_direct_connection(new_direct_connection)
+            self._start_connection_status_thread(new_direct_connection)
 
     def _on_delete_direct_connection(self, row: int):
         """Delete a direct connection."""
