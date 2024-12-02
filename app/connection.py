@@ -163,7 +163,7 @@ class PortForward:
 
 @dataclass
 class ProxyJump:
-    DEFAULT_TARGET_PORT = 8080
+    DEFAULT_TARGET_PORT = 22
     DEFAULT_JUMP_PORT = 22
     DEFAULT_DEVICE_TYPE = DeviceType.SERVER
 
