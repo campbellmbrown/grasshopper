@@ -207,7 +207,7 @@ class PortForwardsWidget(QWidget):
         self.proxy_model.setSortRole(Qt.ItemDataRole.UserRole)
         self.proxy_model.setSourceModel(self.model)
         view.attach_model(self.proxy_model)
-        view.doubleClicked.connect(self._on_row_double_clicked)
+        view.item_activated.connect(self._on_port_forward_activated)
         view.new_item.connect(self._on_new_port_forward)
         view.edit_item.connect(self._on_edit_port_forward)
         view.duplicate_item.connect(self._on_duplicate_port_forward)
@@ -226,9 +226,9 @@ class PortForwardsWidget(QWidget):
         layout.addWidget(view)
         self.setLayout(layout)
 
-    def _on_row_double_clicked(self, index: QModelIndex):
+    def _on_port_forward_activated(self, row: int):
         """Open a new terminal window and connect to the host."""
-        source_index = self.proxy_model.mapToSource(index)
+        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
         pf = self.model.get_port_forward(source_index.row())
 
         key_arg = f"-i {pf.key}" if pf.key else ""

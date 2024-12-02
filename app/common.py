@@ -1,5 +1,5 @@
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent
+from PyQt5.QtCore import QItemSelectionModel, Qt, pyqtSignal
+from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
 from PyQt5.QtWidgets import QAction, QMenu, QTableView
 
 from app.icons import get_icon
@@ -22,6 +22,7 @@ class StyleSheets:
 class ViewBase(QTableView):
     """Base class for all table views in the application."""
 
+    item_activated = pyqtSignal(int)
     new_item = pyqtSignal()
     edit_item = pyqtSignal(int)
     duplicate_item = pyqtSignal(int)
@@ -45,6 +46,7 @@ class ViewBase(QTableView):
         self.menu.addAction(self.duplicate_action)
         self.menu.addAction(self.delete_action)
 
+        self.doubleClicked.connect(lambda: self.item_activated.emit(self.currentIndex().row()))
         self.new_action.triggered.connect(self.new_item)
         self.edit_action.triggered.connect(lambda: self.edit_item.emit(self.currentIndex().row()))
         self.duplicate_action.triggered.connect(lambda: self.duplicate_item.emit(self.currentIndex().row()))
@@ -57,3 +59,19 @@ class ViewBase(QTableView):
         self.duplicate_action.setEnabled(is_valid)
         self.delete_action.setEnabled(is_valid)
         self.menu.exec_(event.globalPos())
+
+    def keyPressEvent(self, event: QKeyEvent):
+        if self.currentIndex().isValid():
+            if event.key() == Qt.Key.Key_Delete:
+                self.delete_item.emit(self.currentIndex().row())
+            elif event.key() == Qt.Key.Key_Return:
+                self.item_activated.emit(self.currentIndex().row())
+            elif event.key() == Qt.Key.Key_Escape:
+                selection_model = self.selectionModel()
+                assert isinstance(selection_model, QItemSelectionModel)
+                selection_model.clearSelection()
+                selection_model.clearCurrentIndex()
+            else:
+                super().keyPressEvent(event)
+        else:
+            super().keyPressEvent(event)

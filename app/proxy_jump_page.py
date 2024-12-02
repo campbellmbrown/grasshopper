@@ -206,7 +206,7 @@ class ProxyJumpsWidget(QWidget):
         self.proxy_model.setSortRole(Qt.ItemDataRole.UserRole)
         self.proxy_model.setSourceModel(self.model)
         view.attach_model(self.proxy_model)
-        view.doubleClicked.connect(self._on_row_double_clicked)
+        view.item_activated.connect(self._on_proxy_jump_activated)
         view.new_item.connect(self._on_new_proxy_jump)
         view.edit_item.connect(self._on_edit_proxy_jump)
         view.duplicate_item.connect(self._on_duplicate_proxy_jump)
@@ -225,9 +225,9 @@ class ProxyJumpsWidget(QWidget):
         layout.addWidget(view)
         self.setLayout(layout)
 
-    def _on_row_double_clicked(self, index: QModelIndex):
+    def _on_proxy_jump_activated(self, row: int):
         """Open a new terminal window and connect to the host through the proxy jump."""
-        source_index = self.proxy_model.mapToSource(index)
+        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
         pj = self.model.get_proxy_jump(source_index.row())
 
         key_arg = f"-i {pj.key}" if pj.key else ""

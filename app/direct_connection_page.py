@@ -209,7 +209,7 @@ class DirectConnectionsWidget(QWidget):
         self.proxy_model.setSortRole(Qt.ItemDataRole.UserRole)
         self.proxy_model.setSourceModel(self.model)
         view.attach_model(self.proxy_model)
-        view.doubleClicked.connect(self._on_row_double_clicked)
+        view.item_activated.connect(self._on_direct_connection_activated)
         view.new_item.connect(self._on_new_direct_connection)
         view.edit_item.connect(self._on_edit_direct_connection)
         view.duplicate_item.connect(self._on_duplicate_direct_connection)
@@ -265,9 +265,9 @@ class DirectConnectionsWidget(QWidget):
         self.connection_status_threads.remove(thread)
         thread.deleteLater()
 
-    def _on_row_double_clicked(self, index: QModelIndex):
+    def _on_direct_connection_activated(self, row: int):
         """Open a new terminal window and connect to the host."""
-        source_index = self.proxy_model.mapToSource(index)
+        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
         conn = self.model.get_direct_connection(source_index.row())
 
         key_arg = f"-i {conn.key}" if conn.key else ""
