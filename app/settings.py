@@ -1,42 +1,27 @@
-import json
-import os
-from dataclasses import dataclass
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QCheckBox, QDialog, QDialogButtonBox, QVBoxLayout
 
-DIRECT_CONNECTIONS_PATH = os.path.join(os.environ["APPDATA"], "StaSSH", "settings.json")
+from app.config_file import ConfigFile
 
 DEFAULT_PROMPT_TO_DOWNLOAD_NEW_VERSION = True
 
 
-@dataclass
 class Settings:
     """Settings for the application. These are saved to disk and loaded on startup."""
 
-    prompt_to_download_new_version: bool = DEFAULT_PROMPT_TO_DOWNLOAD_NEW_VERSION
+    def __init__(self, prompt_to_download_new_version: bool = DEFAULT_PROMPT_TO_DOWNLOAD_NEW_VERSION):
+        self.prompt_to_download_new_version = prompt_to_download_new_version
+        self.source = ConfigFile("settings.json")
 
     def set_prompt_to_download_new_version(self, value: bool):
         self.prompt_to_download_new_version = value
         self.save()
 
     def load(self):
-        self._load_defaults()
-        if not os.path.exists(DIRECT_CONNECTIONS_PATH):
-            return
-        with open(DIRECT_CONNECTIONS_PATH) as file:
-            try:
-                settings = json.load(file)
-            except json.JSONDecodeError:
-                settings = None
-            if settings is not None:
-                self._from_json(settings)
+        self._from_json(self.source.load())
 
     def save(self):
-        if not os.path.exists(DIRECT_CONNECTIONS_PATH):
-            os.makedirs(os.path.dirname(DIRECT_CONNECTIONS_PATH), exist_ok=True)
-        with open(DIRECT_CONNECTIONS_PATH, "w") as file:
-            file.write(json.dumps(self._to_json(), indent=4))
+        self.source.save(self._to_json())
 
     def _to_json(self):
         return {"prompt_to_download_new_version": self.prompt_to_download_new_version}

@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import subprocess
@@ -18,11 +17,10 @@ from PyQt5.QtWidgets import (
 )
 
 from app.common import StyleSheets, ViewBase
+from app.config_file import ConfigFile
 from app.connection import DEVICE_TYPE_ICONS, DeviceType, ProxyJump
 from app.icons import get_icon
 from app.proxy_jump_dialog import ProxyJumpDialog
-
-PROXY_JUMPS_PATH = os.path.join(os.environ["APPDATA"], "StaSSH", "proxy_jumps.json")
 
 
 class ProxyJumpsHeader(IntEnum):
@@ -56,6 +54,8 @@ class ProxyJumpsModel(QAbstractTableModel):
             ProxyJumpsHeader.KEY: "Key",
         }
         assert len(self.headers) == len(ProxyJumpsHeader)
+
+        self.source = ConfigFile("proxy_jumps.json")
         self._load()
 
     def add_proxy_jump(self, proxy_jump: ProxyJump) -> None:
@@ -159,23 +159,13 @@ class ProxyJumpsModel(QAbstractTableModel):
                 return QColor(Qt.GlobalColor.gray)
 
     def _load(self):
-        if not os.path.exists(PROXY_JUMPS_PATH):
-            return
-        with open(PROXY_JUMPS_PATH) as file:
-            try:
-                loaded_proxy_jumps = json.load(file)
-            except json.JSONDecodeError:
-                loaded_proxy_jumps = None
-            if loaded_proxy_jumps is not None and "proxy_jumps" in loaded_proxy_jumps:
-                proxy_jumps = loaded_proxy_jumps["proxy_jumps"]
-                for proxy_jump in proxy_jumps:
-                    self.proxy_jumps.append(ProxyJump.from_dict(proxy_jump))
+        loaded_proxy_jumps = self.source.load()
+        if "proxy_jumps" in loaded_proxy_jumps:
+            for proxy_jump in loaded_proxy_jumps["proxy_jumps"]:
+                self.proxy_jumps.append(ProxyJump.from_dict(proxy_jump))
 
     def _save(self):
-        if not os.path.exists(PROXY_JUMPS_PATH):
-            os.makedirs(os.path.dirname(PROXY_JUMPS_PATH), exist_ok=True)
-        with open(PROXY_JUMPS_PATH, "w") as file:
-            json.dump({"proxy_jumps": [pj.to_dict() for pj in self.proxy_jumps]}, file, indent=4)
+        self.source.save({"proxy_jumps": [pj.to_dict() for pj in self.proxy_jumps]})
 
 
 class ProxyJumpsView(ViewBase):

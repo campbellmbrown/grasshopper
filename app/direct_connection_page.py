@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import subprocess
@@ -19,6 +18,7 @@ from PyQt5.QtWidgets import (
 )
 
 from app.common import StyleSheets, ViewBase
+from app.config_file import ConfigFile
 from app.connection import DEVICE_TYPE_ICONS, DeviceType, DirectConnection
 from app.connection_status import (
     CONNECTION_STATUS_ICONS,
@@ -27,8 +27,6 @@ from app.connection_status import (
 )
 from app.direct_connection_dialog import DirectConnectionDialog
 from app.icons import get_icon
-
-DIRECT_CONNECTIONS_PATH = os.path.join(os.environ["APPDATA"], "StaSSH", "direct_connections.json")
 
 
 class DirectConnectionsHeader(IntEnum):
@@ -59,6 +57,8 @@ class DirectConnectionsModel(QAbstractTableModel):
             DirectConnectionsHeader.CONNECTION_STATUS: "Status",
         }
         assert len(self.headers) == len(DirectConnectionsHeader)
+
+        self.source = ConfigFile("direct_connections.json")
         self._load()
 
     def add_direct_connection(self, direct_connection: DirectConnection) -> None:
@@ -164,24 +164,14 @@ class DirectConnectionsModel(QAbstractTableModel):
                 return QColor(Qt.GlobalColor.gray)
 
     def _load(self):
-        if not os.path.exists(DIRECT_CONNECTIONS_PATH):
-            return
-        with open(DIRECT_CONNECTIONS_PATH) as file:
-            try:
-                loaded_direct_connections = json.load(file)
-            except json.JSONDecodeError:
-                loaded_direct_connections = None
-            if loaded_direct_connections is not None and "direct_connections" in loaded_direct_connections:
-                direct_connections = loaded_direct_connections["direct_connections"]
-                for connection in direct_connections:
-                    self.direct_connections.append(DirectConnection.from_dict(connection))
-                    self.connection_statuses.append(ConnectionStatus.UNKNOWN)
+        loaded_direct_connections = self.source.load()
+        if "direct_connections" in loaded_direct_connections:
+            for connection in loaded_direct_connections["direct_connections"]:
+                self.direct_connections.append(DirectConnection.from_dict(connection))
+                self.connection_statuses.append(ConnectionStatus.UNKNOWN)
 
     def _save(self):
-        if not os.path.exists(DIRECT_CONNECTIONS_PATH):
-            os.makedirs(os.path.dirname(DIRECT_CONNECTIONS_PATH), exist_ok=True)
-        with open(DIRECT_CONNECTIONS_PATH, "w") as file:
-            json.dump({"direct_connections": [conn.to_dict() for conn in self.direct_connections]}, file, indent=4)
+        self.source.save({"direct_connections": [conn.to_dict() for conn in self.direct_connections]})
 
 
 class DirectConnectionsView(ViewBase):

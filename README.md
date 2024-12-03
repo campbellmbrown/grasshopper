@@ -23,9 +23,6 @@
 StaSSH is a "stash" of your SSH connections.
 The goal is to provide a simple GUI allowing easily connections to your servers without having to remember tedious commands.
 
-> [!NOTE]
-> Only Windows is supported for now.
-
 ## Direct Connections
 
 Direct connections are the most simple way to connect to a server. They have the following properties:
@@ -41,7 +38,7 @@ These additional properties are for personal identification:
 - **Name**
 - **Notes**
 
-Direct connections are saved to `%APPDATA%/StaSSH/direct_connections.json` on Windows.
+Direct connections are saved to `%APPDATA%/StaSSH/direct_connections.json` on Windows or `~/.config/stassh/direct_connections.json` on Linux.
 
 ## Proxy Jumps
 
@@ -61,7 +58,7 @@ These additional properties are for personal identification:
 - **Name**
 - **Notes**
 
-Proxy jumps are saved to `%APPDATA%/StaSSH/proxy_jumps.json` on Windows.
+Proxy jumps are saved to `%APPDATA%/StaSSH/proxy_jumps.json` on Windows or `~/.config/stassh/proxy_jumps.json` on Linux.
 
 ## Port Forwarding
 
@@ -80,7 +77,7 @@ These additional properties are for personal identification:
 - **Name**
 - **Notes**
 
-Port forwarding are saved to `%APPDATA%/StaSSH/port_forwards.json` on Windows.
+Port forwarding are saved to `%APPDATA%/StaSSH/port_forwards.json` on Windows or `~/.config/stassh/port_forwards.json` on Linux.
 
 # Setup
 
@@ -115,13 +112,11 @@ Build into a single executable without the console using PyInstaller:
 sh sh/publish.sh
 ```
 
-The ``stassh.exe`` file will be in the ``dist`` directory.
+The executable (``stassh.exe`` on Windows, ``stassh`` on Linux) will be in the ``dist`` directory.
 
 # Build the Installer
 
-Remove all executables in the ``installer`` directory:
-
-Build the installer using Docker:
+Build the installer using Docker on Windows:
 
 ```bash
 rm -rf installer/*.exe

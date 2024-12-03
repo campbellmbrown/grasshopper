@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import subprocess
@@ -18,10 +17,9 @@ from PyQt5.QtWidgets import (
 )
 
 from app.common import StyleSheets, ViewBase
+from app.config_file import ConfigFile
 from app.connection import PortForward
 from app.port_forward_dialog import PortForwardDialog
-
-DATABASE_PATH = os.path.join(os.environ["APPDATA"], "StaSSH", "port_forwards.json")
 
 
 class PortForwardsHeader(IntEnum):
@@ -55,6 +53,8 @@ class PortForwardsModel(QAbstractTableModel):
             PortForwardsHeader.KEY: "Key",
         }
         assert len(self.headers) == len(PortForwardsHeader)
+
+        self.source = ConfigFile("port_forwards.json")
         self._load()
 
     def add_port_forward(self, port_forward: PortForward) -> None:
@@ -154,23 +154,13 @@ class PortForwardsModel(QAbstractTableModel):
                 return QColor(Qt.GlobalColor.gray)
 
     def _load(self):
-        if not os.path.exists(DATABASE_PATH):
-            return
-        with open(DATABASE_PATH, "r") as file:
-            try:
-                loaded_port_forwards = json.load(file)
-            except json.JSONDecodeError:
-                loaded_port_forwards = None
-            if loaded_port_forwards is not None and "port_forwards" in loaded_port_forwards:
-                port_forwards = loaded_port_forwards["port_forwards"]
-                for port_forward in port_forwards:
-                    self.port_forwards.append(PortForward.from_dict(port_forward))
+        loaded_port_forwards = self.source.load()
+        if "port_forwards" in loaded_port_forwards:
+            for port_forward in loaded_port_forwards["port_forwards"]:
+                self.port_forwards.append(PortForward.from_dict(port_forward))
 
     def _save(self):
-        if not os.path.exists(os.path.dirname(DATABASE_PATH)):
-            os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
-        with open(DATABASE_PATH, "w") as file:
-            json.dump({"port_forwards": [pf.to_dict() for pf in self.port_forwards]}, file, indent=4)
+        self.source.save({"port_forwards": [pf.to_dict() for pf in self.port_forwards]})
 
 
 class PortForwardsView(ViewBase):
