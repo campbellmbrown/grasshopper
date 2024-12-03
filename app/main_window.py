@@ -1,6 +1,7 @@
 import logging
 
 from PyQt5.QtCore import QObject, Qt, pyqtSignal
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
     QDialog,
     QDockWidget,
@@ -10,7 +11,6 @@ from PyQt5.QtWidgets import (
     QMenuBar,
     QPlainTextEdit,
     QTabWidget,
-    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -27,11 +27,13 @@ from app.version_checker import GetLatestVersionThread, NewVersionDialog
 class Logger(logging.Handler, QObject):
     append_to_widget = pyqtSignal(str)
 
-    def __init__(self, parent):
+    def __init__(self):
         super().__init__()
         QObject.__init__(self)
-        self.widget = QPlainTextEdit(parent)
+        self.widget = QPlainTextEdit()
         self.widget.setReadOnly(True)
+        self.widget.setFont(QFont("Consolas"))  # Use a fixed width font
+        self.widget.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.append_to_widget.connect(self.widget.appendPlainText)
 
     def emit(self, record):
@@ -87,11 +89,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(tabs)
 
         dock = QDockWidget("Log")
-        log_text = QTextEdit()
-        log_text.setReadOnly(True)
-        log_text.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
-        log_text.setFontFamily("Consolas")  # Use a fixed width font
-        log_handler = Logger(log_text)
+        log_handler = Logger()
         dock.setWidget(log_handler.widget)
         dock.setFeatures(
             QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable
