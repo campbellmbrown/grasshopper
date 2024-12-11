@@ -49,6 +49,9 @@ class AboutDialog(QDialog):
         layout.addWidget(QLabel(f"Version: {__version__}"))
         layout.addWidget(QLabel(f"SHA: {GIT_SHA}"))
         layout.addWidget(QLabel("Author: Campbell Brown"))
+        github_label = QLabel('GitHub: <a href="https://github.com/campbellmbrown/stassh">campbellmbrown/stassh</a>')
+        github_label.setOpenExternalLinks(True)
+        layout.addWidget(github_label)
         self.setLayout(layout)
 
 
