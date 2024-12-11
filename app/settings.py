@@ -30,9 +30,6 @@ class Settings:
         if "prompt_to_download_new_version" in json:
             self.prompt_to_download_new_version = json["prompt_to_download_new_version"]
 
-    def _load_defaults(self):
-        self.prompt_to_download_new_version = DEFAULT_PROMPT_TO_DOWNLOAD_NEW_VERSION
-
 
 class SettingsDialog(QDialog):
     """Dialog to change application settings."""
