@@ -1,8 +1,11 @@
 import logging
 
+import qdarktheme
 from PyQt5.QtCore import QObject, Qt, pyqtSignal
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
+    QActionGroup,
+    QApplication,
     QDialog,
     QDockWidget,
     QLabel,
@@ -19,7 +22,7 @@ from app.direct_connection_page import DirectConnectionsWidget
 from app.icons import get_icon
 from app.port_forward_page import PortForwardsWidget
 from app.proxy_jump_page import ProxyJumpsWidget
-from app.settings import Settings, SettingsDialog
+from app.settings import Settings
 from app.version import GIT_SHA, __version__
 from app.version_checker import GetLatestVersionThread, NewVersionDialog
 
@@ -71,12 +74,42 @@ class MainWindow(QMainWindow):
         port_forwards_widget = PortForwardsWidget()
 
         file_menu = QMenu("&File", self)
-        file_menu.addAction(get_icon("gear.png"), "&Settings", self._on_open_settings)
+        preferences_menu = QMenu("&Preferences", self)
+        theme_menu = QMenu("&Theme", self)
+        preferences_menu.addMenu(theme_menu)
+
+        theme_action_group = QActionGroup(self)
+        theme_action_group.setExclusive(True)
+        light_theme_action = theme_action_group.addAction("light")
+        dark_theme_action = theme_action_group.addAction("dark")
+        assert light_theme_action is not None
+        assert dark_theme_action is not None
+        light_theme_action.setCheckable(True)
+        dark_theme_action.setCheckable(True)
+        theme_menu.addAction(light_theme_action)
+        theme_menu.addAction(dark_theme_action)
+        dark_theme_action.triggered.connect(lambda: self._change_theme("dark"))
+        light_theme_action.triggered.connect(lambda: self._change_theme("light"))
+
+        prompt_to_download_new_version_action = preferences_menu.addAction("&Check version")
+        assert prompt_to_download_new_version_action is not None
+        prompt_to_download_new_version_action.setCheckable(True)
+        prompt_to_download_new_version_action.setChecked(self.settings.prompt_to_download_new_version)
+        prompt_to_download_new_version_action.triggered.connect(self._change_prompt_to_download_new_version)
+
+        if self.settings.theme == "dark":
+            dark_theme_action.setChecked(True)
+            self._change_theme("dark")
+        else:  # Default to light theme
+            light_theme_action.setChecked(True)
+            self._change_theme("light")
+
+        file_menu.addMenu(preferences_menu)
         file_menu.addSeparator()
-        file_menu.addAction(get_icon("exit.png"), "E&xit", self.close)
+        file_menu.addAction("E&xit", self.close)
 
         help_menu = QMenu("&Help", self)
-        help_menu.addAction(get_icon("question.png"), "&About", self._on_about)
+        help_menu.addAction("&About", self._on_about)
 
         menu_bar = QMenuBar()
         menu_bar.addMenu(file_menu)
@@ -113,14 +146,6 @@ class MainWindow(QMainWindow):
         self.version_check_thread.new_version_available.connect(self._on_new_version_available)
         self.version_check_thread.start()
 
-    def _on_open_settings(self):
-        """Show the settings dialog."""
-        settings_dialog = SettingsDialog(self.settings)
-        result = settings_dialog.exec_()
-        if result == QDialog.DialogCode.Accepted:
-            self.settings = settings_dialog.to_settings()
-            self.settings.save()
-
     def _on_about(self):
         """Show the about dialog."""
         about_dialog = AboutDialog()
@@ -131,3 +156,19 @@ class MainWindow(QMainWindow):
         if self.settings.prompt_to_download_new_version:
             new_version_dialog = NewVersionDialog(self.settings, latest_version, url, publish_date)
             new_version_dialog.exec_()
+
+    def _change_theme(self, theme: str):
+        """Change the application theme."""
+        stylesheet = qdarktheme.load_stylesheet(theme)
+        application = QApplication.instance()
+        assert isinstance(application, QApplication)
+        application.setStyleSheet(stylesheet)
+        self.settings.set_theme(theme)
+
+    def _change_prompt_to_download_new_version(self, checked: bool):
+        """Change the setting to prompt to download new version setting.
+
+        Args:
+            checked (bool): Whether to prompt to download new versions.
+        """
+        self.settings.set_prompt_to_download_new_version(checked)
