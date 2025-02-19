@@ -4,7 +4,7 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt5.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyModel, Qt
+from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QDialog,
@@ -167,8 +167,8 @@ class PortForwardsView(ViewBase):
     def __init__(self):
         super().__init__()
 
-    def attach_model(self, proxy_model: QSortFilterProxyModel) -> None:
-        self.setModel(proxy_model)
+    def attach_model(self, model: QAbstractItemModel) -> None:
+        self.setModel(model)
         header = self.horizontalHeader()
         assert isinstance(header, QHeaderView)
         header.setSectionResizeMode(PortForwardsHeader.NAME.value, QHeaderView.ResizeMode.Stretch)
@@ -193,10 +193,7 @@ class PortForwardsWidget(QWidget):
 
         view = PortForwardsView()
         self.model = PortForwardsModel()
-        self.proxy_model = QSortFilterProxyModel()
-        self.proxy_model.setSortRole(Qt.ItemDataRole.UserRole)
-        self.proxy_model.setSourceModel(self.model)
-        view.attach_model(self.proxy_model)
+        view.attach_model(self.model)
         view.item_activated.connect(self._on_port_forward_activated)
         view.new_item.connect(self._on_new_port_forward)
         view.edit_item.connect(self._on_edit_port_forward)
@@ -218,7 +215,7 @@ class PortForwardsWidget(QWidget):
 
     def _on_port_forward_activated(self, row: int):
         """Open a new terminal window and connect to the host."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
+        source_index = self.model.index(row, 0)
         pf = self.model.get_port_forward(source_index.row())
 
         key_arg = f"-i {pf.key}" if pf.key else ""
@@ -236,7 +233,7 @@ class PortForwardsWidget(QWidget):
 
     def _on_edit_port_forward(self, row: int):
         """Open an edit port forward dialog."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
+        source_index = self.model.index(row, 0)
         port_forward = self.model.get_port_forward(source_index.row())
 
         dialog = PortForwardDialog("Edit Port Forward")
@@ -247,7 +244,7 @@ class PortForwardsWidget(QWidget):
 
     def _on_duplicate_port_forward(self, row: int):
         """Duplicate a port forward into a new port forward dialog."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
+        source_index = self.model.index(row, 0)
         port_forward = self.model.get_port_forward(source_index.row()).copy()
         port_forward.name += " (Copy)"
         dialog = PortForwardDialog("New Port Forward")
@@ -266,5 +263,5 @@ class PortForwardsWidget(QWidget):
             QMessageBox.StandardButton.Yes,
         )
         if confirmed == QMessageBox.StandardButton.Yes:
-            source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
+            source_index = self.model.index(row, 0)
             self.model.delete_port_forward(source_index.row())

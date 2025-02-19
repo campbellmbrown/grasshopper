@@ -34,7 +34,7 @@ class ViewBase(QTableView):
         self.setShowGrid(False)
         self.setSelectionMode(QTableView.SelectionMode.SingleSelection)
         self.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
-        self.setSortingEnabled(True)
+        self.setSortingEnabled(False)
 
         self.new_action = QAction(get_icon("new.png"), "New")
         self.edit_action = QAction(get_icon("pencil.png"), "Edit")

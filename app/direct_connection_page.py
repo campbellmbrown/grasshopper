@@ -4,7 +4,7 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt5.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyModel, Qt
+from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QAction,
@@ -178,8 +178,8 @@ class DirectConnectionsView(ViewBase):
     def __init__(self):
         super().__init__()
 
-    def attach_model(self, proxy_model: QSortFilterProxyModel) -> None:
-        self.setModel(proxy_model)
+    def attach_model(self, model: QAbstractItemModel):
+        self.setModel(model)
         header = self.horizontalHeader()
         assert isinstance(header, QHeaderView)
         header.setSectionResizeMode(DirectConnectionsHeader.NAME.value, QHeaderView.ResizeMode.Stretch)
@@ -195,10 +195,7 @@ class DirectConnectionsWidget(QWidget):
 
         view = DirectConnectionsView()
         self.model = DirectConnectionsModel()
-        self.proxy_model = QSortFilterProxyModel()
-        self.proxy_model.setSortRole(Qt.ItemDataRole.UserRole)
-        self.proxy_model.setSourceModel(self.model)
-        view.attach_model(self.proxy_model)
+        view.attach_model(self.model)
         view.item_activated.connect(self._on_direct_connection_activated)
         view.new_item.connect(self._on_new_direct_connection)
         view.edit_item.connect(self._on_edit_direct_connection)
@@ -257,8 +254,7 @@ class DirectConnectionsWidget(QWidget):
 
     def _on_direct_connection_activated(self, row: int):
         """Open a new terminal window and connect to the host."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        conn = self.model.get_direct_connection(source_index.row())
+        conn = self.model.get_direct_connection(row)
 
         key_arg = f"-i {conn.key}" if conn.key else ""
         command = f"ssh {key_arg} {conn.user}@{conn.host} -p{conn.port}"
@@ -276,22 +272,20 @@ class DirectConnectionsWidget(QWidget):
 
     def _on_edit_direct_connection(self, row: int):
         """Open an edit direct connection dialog."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        direct_connection = self.model.get_direct_connection(source_index.row())
+        direct_connection = self.model.get_direct_connection(row)
 
         dialog = DirectConnectionDialog("Edit Direct Connection")
         dialog.populate_fields(direct_connection)
         result = dialog.exec_()
         if result == QDialog.DialogCode.Accepted:
             edited_direct_connection = dialog.to_direct_connection()
-            self.model.update_direct_connection(source_index.row(), dialog.to_direct_connection())
+            self.model.update_direct_connection(row, dialog.to_direct_connection())
             self.model.new_connection_status(edited_direct_connection, ConnectionStatus.UNKNOWN)
             self._start_connection_status_thread(edited_direct_connection)
 
     def _on_duplicate_direct_connection(self, row: int):
         """Duplicate a direct connection into a new direct connection dialog."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        direct_connection = self.model.get_direct_connection(source_index.row()).copy()
+        direct_connection = self.model.get_direct_connection(row).copy()
         direct_connection.name += " (Copy)"
         dialog = DirectConnectionDialog("New Direct Connection")
         dialog.populate_fields(direct_connection)
@@ -311,5 +305,4 @@ class DirectConnectionsWidget(QWidget):
             QMessageBox.StandardButton.Yes,
         )
         if confirmed == QMessageBox.StandardButton.Yes:
-            source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-            self.model.delete_direct_connection(source_index.row())
+            self.model.delete_direct_connection(row)

@@ -4,7 +4,7 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt5.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyModel, Qt
+from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QDialog,
@@ -172,8 +172,8 @@ class ProxyJumpsView(ViewBase):
     def __init__(self):
         super().__init__()
 
-    def attach_model(self, proxy_model: QSortFilterProxyModel) -> None:
-        self.setModel(proxy_model)
+    def attach_model(self, model: QAbstractItemModel) -> None:
+        self.setModel(model)
         header = self.horizontalHeader()
         assert isinstance(header, QHeaderView)
         header.setSectionResizeMode(ProxyJumpsHeader.NAME.value, QHeaderView.ResizeMode.Stretch)
@@ -192,10 +192,7 @@ class ProxyJumpsWidget(QWidget):
 
         view = ProxyJumpsView()
         self.model = ProxyJumpsModel()
-        self.proxy_model = QSortFilterProxyModel()
-        self.proxy_model.setSortRole(Qt.ItemDataRole.UserRole)
-        self.proxy_model.setSourceModel(self.model)
-        view.attach_model(self.proxy_model)
+        view.attach_model(self.model)
         view.item_activated.connect(self._on_proxy_jump_activated)
         view.new_item.connect(self._on_new_proxy_jump)
         view.edit_item.connect(self._on_edit_proxy_jump)
@@ -217,8 +214,7 @@ class ProxyJumpsWidget(QWidget):
 
     def _on_proxy_jump_activated(self, row: int):
         """Open a new terminal window and connect to the host through the proxy jump."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        pj = self.model.get_proxy_jump(source_index.row())
+        pj = self.model.get_proxy_jump(row)
 
         key_arg = f"-i {pj.key}" if pj.key else ""
         jump_arg = f"-J {pj.jump_user}@{pj.jump_host}:{pj.jump_port}"
@@ -236,19 +232,17 @@ class ProxyJumpsWidget(QWidget):
 
     def _on_edit_proxy_jump(self, row: int):
         """Open an edit proxy jump dialog."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        proxy_jump = self.model.get_proxy_jump(source_index.row())
+        proxy_jump = self.model.get_proxy_jump(row)
 
         dialog = ProxyJumpDialog("Edit proxy jump")
         dialog.populate_fields(proxy_jump)
         result = dialog.exec_()
         if result == QDialog.DialogCode.Accepted:
-            self.model.update_proxy_jump(source_index.row(), dialog.to_proxy_jump())
+            self.model.update_proxy_jump(row, dialog.to_proxy_jump())
 
     def _on_duplicate_proxy_jump(self, row: int):
         """Duplicate a proxy jump into a new proxy jump dialog."""
-        source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-        proxy_jump = self.model.get_proxy_jump(source_index.row()).copy()
+        proxy_jump = self.model.get_proxy_jump(row).copy()
         proxy_jump.name += " (Copy)"
         dialog = ProxyJumpDialog("New proxy jump")
         dialog.populate_fields(proxy_jump)
@@ -266,5 +260,4 @@ class ProxyJumpsWidget(QWidget):
             QMessageBox.StandardButton.Yes,
         )
         if confirmed == QMessageBox.StandardButton.Yes:
-            source_index = self.proxy_model.mapToSource(self.proxy_model.index(row, 0))
-            self.model.delete_proxy_jump(source_index.row())
+            self.model.delete_proxy_jump(row)
