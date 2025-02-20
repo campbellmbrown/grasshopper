@@ -5,9 +5,10 @@ from enum import IntEnum
 from typing import Any
 
 from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QClipboard, QColor
 from PyQt5.QtWidgets import (
     QAction,
+    QApplication,
     QDialog,
     QHBoxLayout,
     QHeaderView,
@@ -225,6 +226,7 @@ class DirectConnectionsWidget(QWidget):
         self.view.edit_item.connect(self._on_edit_direct_connection)
         self.view.duplicate_item.connect(self._on_duplicate_direct_connection)
         self.view.delete_item.connect(self._on_delete_direct_connection)
+        self.view.copy_command.connect(self._on_copy_command)
 
         new_button = QToolButton()
         new_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
@@ -292,9 +294,7 @@ class DirectConnectionsWidget(QWidget):
     def _on_direct_connection_activated(self, row: int):
         """Open a new terminal window and connect to the host."""
         conn = self.model.get_direct_connection(row)
-
-        key_arg = f"-i {conn.key}" if conn.key else ""
-        command = f"ssh {key_arg} {conn.user}@{conn.host} -p{conn.port}"
+        command = conn.command()
         logging.info(f"Running: {command}")
         subprocess.Popen(["start", "cmd", "/k", command], shell=True)
 
@@ -343,6 +343,15 @@ class DirectConnectionsWidget(QWidget):
         )
         if confirmed == QMessageBox.StandardButton.Yes:
             self.model.delete_direct_connection(row)
+
+    def _on_copy_command(self, row: int):
+        """Copy the SSH command to the clipboard."""
+        conn = self.model.get_direct_connection(row)
+        command = conn.command()
+        clipboard = QApplication.clipboard()
+        assert isinstance(clipboard, QClipboard)
+        clipboard.setText(command)
+        logging.info(f"Copied to clipboard: {command}")
 
     def _move_selected_row_up(self):
         """Move the selected row up."""

@@ -32,6 +32,11 @@ class DirectConnection:
     key: str
     notes: str
 
+    def command(self) -> str:
+        """Get the command to connect to the server."""
+        key_arg = f"-i {self.key}" if self.key else ""
+        return f"ssh {key_arg} {self.user}@{self.host} -p{self.port}"
+
     def to_dict(self) -> dict:
         """Convert the direct connection to a dictionary."""
         return {
@@ -101,6 +106,11 @@ class PortForward:
     remote_server_host: str
     remote_server_port: int
     key: str
+
+    def command(self) -> str:
+        key_arg = f"-i {self.key}" if self.key else ""
+        remote_server_arg = f"{self.remote_server_user}@{self.remote_server_host} -p{self.remote_server_port}"
+        return f"ssh -N -L {self.local_port}:{self.target_host}:{self.target_port} {remote_server_arg} {key_arg}"
 
     def to_dict(self) -> dict:
         """Convert the port forward to a dictionary."""
@@ -177,6 +187,12 @@ class ProxyJump:
     jump_host: str
     jump_port: int
     key: str
+
+    def command(self) -> str:
+        key_arg = f"-i {self.key}" if self.key else ""
+        jump_arg = f"-J {self.jump_user}@{self.jump_host}:{self.jump_port}"
+        target_arg = f"{self.target_user}@{self.target_host} -p{self.target_port}"
+        return f"ssh {key_arg} {jump_arg} {target_arg}"
 
     def to_dict(self) -> dict:
         """Convert the proxy jump to a dictionary."""

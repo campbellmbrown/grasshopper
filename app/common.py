@@ -27,6 +27,7 @@ class ViewBase(QTableView):
     edit_item = pyqtSignal(int)
     duplicate_item = pyqtSignal(int)
     delete_item = pyqtSignal(int)
+    copy_command = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
@@ -40,17 +41,21 @@ class ViewBase(QTableView):
         self.edit_action = QAction(get_icon("pencil.png"), "Edit")
         self.duplicate_action = QAction(get_icon("duplicate.png"), "Duplicate")
         self.delete_action = QAction(get_icon("x.png"), "Delete")
+        self.copy_command_action = QAction(get_icon("copy-command.png"), "Copy Command")
         self.menu = QMenu(self)
         self.menu.addAction(self.new_action)
         self.menu.addAction(self.edit_action)
         self.menu.addAction(self.duplicate_action)
         self.menu.addAction(self.delete_action)
+        self.menu.addSeparator()
+        self.menu.addAction(self.copy_command_action)
 
         self.doubleClicked.connect(lambda: self.item_activated.emit(self.currentIndex().row()))
         self.new_action.triggered.connect(self.new_item)
         self.edit_action.triggered.connect(lambda: self.edit_item.emit(self.currentIndex().row()))
         self.duplicate_action.triggered.connect(lambda: self.duplicate_item.emit(self.currentIndex().row()))
         self.delete_action.triggered.connect(lambda: self.delete_item.emit(self.currentIndex().row()))
+        self.copy_command_action.triggered.connect(lambda: self.copy_command.emit(self.currentIndex().row()))
 
     def contextMenuEvent(self, event: QContextMenuEvent) -> None:
         index = self.indexAt(event.pos())
@@ -58,6 +63,7 @@ class ViewBase(QTableView):
         self.edit_action.setEnabled(is_valid)
         self.duplicate_action.setEnabled(is_valid)
         self.delete_action.setEnabled(is_valid)
+        self.copy_command_action.setEnabled(is_valid)
         self.menu.exec_(event.globalPos())
 
     def keyPressEvent(self, event: QKeyEvent):

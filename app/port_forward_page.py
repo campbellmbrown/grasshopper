@@ -5,9 +5,10 @@ from enum import IntEnum
 from typing import Any
 
 from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QClipboard, QColor
 from PyQt5.QtWidgets import (
     QAction,
+    QApplication,
     QDialog,
     QHBoxLayout,
     QHeaderView,
@@ -224,6 +225,7 @@ class PortForwardsWidget(QWidget):
         self.view.edit_item.connect(self._on_edit_port_forward)
         self.view.duplicate_item.connect(self._on_duplicate_port_forward)
         self.view.delete_item.connect(self._on_delete_port_forward)
+        self.view.copy_command.connect(self._on_copy_command)
 
         new_button = QToolButton()
         new_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
@@ -255,10 +257,7 @@ class PortForwardsWidget(QWidget):
         """Open a new terminal window and connect to the host."""
         source_index = self.model.index(row, 0)
         pf = self.model.get_port_forward(source_index.row())
-
-        key_arg = f"-i {pf.key}" if pf.key else ""
-        remote_server_arg = f"{pf.remote_server_user}@{pf.remote_server_host} -p{pf.remote_server_port}"
-        command = f"ssh -N -L {pf.local_port}:{pf.target_host}:{pf.target_port} {remote_server_arg} {key_arg}"
+        command = pf.command()
         logging.info(f"Running: {command}")
         subprocess.Popen(["start", "cmd", "/k", command], shell=True)
 
@@ -303,6 +302,15 @@ class PortForwardsWidget(QWidget):
         if confirmed == QMessageBox.StandardButton.Yes:
             source_index = self.model.index(row, 0)
             self.model.delete_port_forward(source_index.row())
+
+    def _on_copy_command(self, row: int):
+        """Copy the SSH command to the clipboard."""
+        pf = self.model.get_port_forward(row)
+        command = pf.command()
+        clipboard = QApplication.clipboard()
+        assert isinstance(clipboard, QClipboard)
+        clipboard.setText(command)
+        logging.info(f"Copied to clipboard: {command}")
 
     def _move_selected_row_up(self):
         """Move the selected row up."""

@@ -5,9 +5,10 @@ from enum import IntEnum
 from typing import Any
 
 from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QClipboard, QColor
 from PyQt5.QtWidgets import (
     QAction,
+    QApplication,
     QDialog,
     QHBoxLayout,
     QHeaderView,
@@ -222,6 +223,7 @@ class ProxyJumpsWidget(QWidget):
         self.view.edit_item.connect(self._on_edit_proxy_jump)
         self.view.duplicate_item.connect(self._on_duplicate_proxy_jump)
         self.view.delete_item.connect(self._on_delete_proxy_jump)
+        self.view.copy_command.connect(self._on_copy_command)
 
         new_button = QToolButton()
         new_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
@@ -252,11 +254,7 @@ class ProxyJumpsWidget(QWidget):
     def _on_proxy_jump_activated(self, row: int):
         """Open a new terminal window and connect to the host through the proxy jump."""
         pj = self.model.get_proxy_jump(row)
-
-        key_arg = f"-i {pj.key}" if pj.key else ""
-        jump_arg = f"-J {pj.jump_user}@{pj.jump_host}:{pj.jump_port}"
-        target_arg = f"{pj.target_user}@{pj.target_host} -p{pj.target_port}"
-        command = f"ssh {key_arg} {jump_arg} {target_arg}"
+        command = pj.command()
         logging.info(f"Running: {command}")
         subprocess.Popen(["start", "cmd", "/k", command], shell=True)
 
@@ -298,6 +296,15 @@ class ProxyJumpsWidget(QWidget):
         )
         if confirmed == QMessageBox.StandardButton.Yes:
             self.model.delete_proxy_jump(row)
+
+    def _on_copy_command(self, row: int):
+        """Copy the SSH command to the clipboard."""
+        pj = self.model.get_proxy_jump(row)
+        command = pj.command()
+        clipboard = QApplication.clipboard()
+        assert isinstance(clipboard, QClipboard)
+        clipboard.setText(command)
+        logging.info(f"Copied to clipboard: {command}")
 
     def _move_selected_row_up(self):
         """Move the selected row up."""
