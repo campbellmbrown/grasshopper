@@ -7,6 +7,7 @@ from typing import Any
 from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
+    QAction,
     QDialog,
     QHBoxLayout,
     QHeaderView,
@@ -81,6 +82,29 @@ class ProxyJumpsModel(QAbstractTableModel):
         self.proxy_jumps.pop(row)
         self.endRemoveRows()
         self._save()
+
+    def move_up(self, row: int) -> None:
+        """Move a proxy jump up in the model.
+
+        Args:
+            row (int): The row of the proxy jump to move up.
+        """
+        if row > 0:
+            self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row - 1)
+            self.proxy_jumps.insert(row - 1, self.proxy_jumps.pop(row))
+            self.endMoveRows()
+            self._save()
+
+    def move_down(self, row: int) -> None:
+        """Move a proxy jump down in the model.
+
+        Args:
+            row (int): The row of the proxy jump to move down.
+        """
+        if row < len(self.proxy_jumps) - 1:
+            self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row + 2)
+            self.proxy_jumps.insert(row + 1, self.proxy_jumps.pop(row))
+            self.endMoveRows()
 
     def get_proxy_jump(self, row: int) -> ProxyJump:
         """Get a proxy jump from the model by row."""
@@ -190,26 +214,39 @@ class ProxyJumpsWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        view = ProxyJumpsView()
+        self.view = ProxyJumpsView()
         self.model = ProxyJumpsModel()
-        view.attach_model(self.model)
-        view.item_activated.connect(self._on_proxy_jump_activated)
-        view.new_item.connect(self._on_new_proxy_jump)
-        view.edit_item.connect(self._on_edit_proxy_jump)
-        view.duplicate_item.connect(self._on_duplicate_proxy_jump)
-        view.delete_item.connect(self._on_delete_proxy_jump)
+        self.view.attach_model(self.model)
+        self.view.item_activated.connect(self._on_proxy_jump_activated)
+        self.view.new_item.connect(self._on_new_proxy_jump)
+        self.view.edit_item.connect(self._on_edit_proxy_jump)
+        self.view.duplicate_item.connect(self._on_duplicate_proxy_jump)
+        self.view.delete_item.connect(self._on_delete_proxy_jump)
 
         new_button = QToolButton()
         new_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
-        new_button.setDefaultAction(view.new_action)
+        new_button.setDefaultAction(self.view.new_action)
+
+        move_up_action = QAction(get_icon("up.png"), "Move Up")
+        move_down_action = QAction(get_icon("down.png"), "Move Down")
+        move_up_button = QToolButton()
+        move_up_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
+        move_up_button.setDefaultAction(move_up_action)
+        move_down_button = QToolButton()
+        move_down_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
+        move_down_button.setDefaultAction(move_down_action)
+        move_up_action.triggered.connect(self._move_selected_row_up)
+        move_down_action.triggered.connect(self._move_selected_row_down)
 
         buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(new_button)
         buttons_layout.addStretch()
+        buttons_layout.addWidget(move_up_button)
+        buttons_layout.addWidget(move_down_button)
 
         layout = QVBoxLayout()
         layout.addLayout(buttons_layout)
-        layout.addWidget(view)
+        layout.addWidget(self.view)
         self.setLayout(layout)
 
     def _on_proxy_jump_activated(self, row: int):
@@ -261,3 +298,15 @@ class ProxyJumpsWidget(QWidget):
         )
         if confirmed == QMessageBox.StandardButton.Yes:
             self.model.delete_proxy_jump(row)
+
+    def _move_selected_row_up(self):
+        """Move the selected row up."""
+        selected_index = self.view.currentIndex()
+        if selected_index.isValid():
+            self.model.move_up(selected_index.row())
+
+    def _move_selected_row_down(self):
+        """Move the selected row down."""
+        selected_index = self.view.currentIndex()
+        if selected_index.isValid():
+            self.model.move_down(selected_index.row())

@@ -7,6 +7,7 @@ from typing import Any
 from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
+    QAction,
     QDialog,
     QHBoxLayout,
     QHeaderView,
@@ -19,6 +20,7 @@ from PyQt5.QtWidgets import (
 from app.common import StyleSheets, ViewBase
 from app.config_file import ConfigFile
 from app.connection import PortForward
+from app.icons import get_icon
 from app.port_forward_dialog import PortForwardDialog
 
 
@@ -80,6 +82,29 @@ class PortForwardsModel(QAbstractTableModel):
         self.port_forwards.pop(row)
         self.endRemoveRows()
         self._save()
+
+    def move_up(self, row: int) -> None:
+        """Move a port forward up in the model.
+
+        Args:
+            row (int): The row of the port forward to move up.
+        """
+        if row > 0:
+            self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row - 1)
+            self.port_forwards.insert(row - 1, self.port_forwards.pop(row))
+            self.endMoveRows()
+            self._save()
+
+    def move_down(self, row: int) -> None:
+        """Move a port forward down in the model.
+
+        Args:
+            row (int): The row of the port forward to move down.
+        """
+        if row < len(self.port_forwards) - 1:
+            self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row + 2)
+            self.port_forwards.insert(row + 1, self.port_forwards.pop(row))
+            self.endMoveRows()
 
     def get_port_forward(self, row: int) -> PortForward:
         """Get a port forward from the model."""
@@ -191,26 +216,39 @@ class PortForwardsWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        view = PortForwardsView()
+        self.view = PortForwardsView()
         self.model = PortForwardsModel()
-        view.attach_model(self.model)
-        view.item_activated.connect(self._on_port_forward_activated)
-        view.new_item.connect(self._on_new_port_forward)
-        view.edit_item.connect(self._on_edit_port_forward)
-        view.duplicate_item.connect(self._on_duplicate_port_forward)
-        view.delete_item.connect(self._on_delete_port_forward)
+        self.view.attach_model(self.model)
+        self.view.item_activated.connect(self._on_port_forward_activated)
+        self.view.new_item.connect(self._on_new_port_forward)
+        self.view.edit_item.connect(self._on_edit_port_forward)
+        self.view.duplicate_item.connect(self._on_duplicate_port_forward)
+        self.view.delete_item.connect(self._on_delete_port_forward)
 
         new_button = QToolButton()
         new_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
-        new_button.setDefaultAction(view.new_action)
+        new_button.setDefaultAction(self.view.new_action)
+
+        move_up_action = QAction(get_icon("up.png"), "Move Up")
+        move_down_action = QAction(get_icon("down.png"), "Move Down")
+        move_up_button = QToolButton()
+        move_up_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
+        move_up_button.setDefaultAction(move_up_action)
+        move_down_button = QToolButton()
+        move_down_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
+        move_down_button.setDefaultAction(move_down_action)
+        move_up_action.triggered.connect(self._move_selected_row_up)
+        move_down_action.triggered.connect(self._move_selected_row_down)
 
         buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(new_button)
         buttons_layout.addStretch()
+        buttons_layout.addWidget(move_up_button)
+        buttons_layout.addWidget(move_down_button)
 
         layout = QVBoxLayout()
         layout.addLayout(buttons_layout)
-        layout.addWidget(view)
+        layout.addWidget(self.view)
         self.setLayout(layout)
 
     def _on_port_forward_activated(self, row: int):
@@ -265,3 +303,15 @@ class PortForwardsWidget(QWidget):
         if confirmed == QMessageBox.StandardButton.Yes:
             source_index = self.model.index(row, 0)
             self.model.delete_port_forward(source_index.row())
+
+    def _move_selected_row_up(self):
+        """Move the selected row up."""
+        selected_index = self.view.currentIndex()
+        if selected_index.isValid():
+            self.model.move_up(selected_index.row())
+
+    def _move_selected_row_down(self):
+        """Move the selected row down."""
+        selected_index = self.view.currentIndex()
+        if selected_index.isValid():
+            self.model.move_down(selected_index.row())

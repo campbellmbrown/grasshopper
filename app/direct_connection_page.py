@@ -87,6 +87,30 @@ class DirectConnectionsModel(QAbstractTableModel):
         self.endRemoveRows()
         self._save()
 
+    def move_up(self, row: int) -> None:
+        """Move a proxy jump up in the model.
+
+        Args:
+            row (int): The row of the proxy jump to move up.
+        """
+        if row > 0:
+            self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row - 1)
+            self.direct_connections.insert(row - 1, self.direct_connections.pop(row))
+            self.connection_statuses.insert(row - 1, self.connection_statuses.pop(row))
+            self.endMoveRows()
+            self.dataChanged.emit(self.index(row - 1, 0), self.index(row, len(self.headers) - 1))
+            self._save()
+
+    def move_down(self, row: int) -> None:
+        """Move a direct connection down one row."""
+        if row < len(self.direct_connections) - 1:
+            self.beginMoveRows(QModelIndex(), row, row, QModelIndex(), row + 2)
+            self.direct_connections.insert(row + 1, self.direct_connections.pop(row))
+            self.connection_statuses.insert(row + 1, self.connection_statuses.pop(row))
+            self.endMoveRows()
+            self.dataChanged.emit(self.index(row, 0), self.index(row + 1, len(self.headers) - 1))
+            self._save()
+
     def get_direct_connection(self, row: int) -> DirectConnection:
         """Get a direct connection from the model by row."""
         return self.direct_connections[row]
@@ -193,18 +217,29 @@ class DirectConnectionsWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        view = DirectConnectionsView()
+        self.view = DirectConnectionsView()
         self.model = DirectConnectionsModel()
-        view.attach_model(self.model)
-        view.item_activated.connect(self._on_direct_connection_activated)
-        view.new_item.connect(self._on_new_direct_connection)
-        view.edit_item.connect(self._on_edit_direct_connection)
-        view.duplicate_item.connect(self._on_duplicate_direct_connection)
-        view.delete_item.connect(self._on_delete_direct_connection)
+        self.view.attach_model(self.model)
+        self.view.item_activated.connect(self._on_direct_connection_activated)
+        self.view.new_item.connect(self._on_new_direct_connection)
+        self.view.edit_item.connect(self._on_edit_direct_connection)
+        self.view.duplicate_item.connect(self._on_duplicate_direct_connection)
+        self.view.delete_item.connect(self._on_delete_direct_connection)
 
         new_button = QToolButton()
         new_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
-        new_button.setDefaultAction(view.new_action)
+        new_button.setDefaultAction(self.view.new_action)
+
+        move_up_action = QAction(get_icon("up.png"), "Move Up")
+        move_down_action = QAction(get_icon("down.png"), "Move Down")
+        move_up_button = QToolButton()
+        move_up_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
+        move_up_button.setDefaultAction(move_up_action)
+        move_down_button = QToolButton()
+        move_down_button.setStyleSheet(StyleSheets.TRANSPARENT_TOOLBUTTON)
+        move_down_button.setDefaultAction(move_down_action)
+        move_up_action.triggered.connect(self._move_selected_row_up)
+        move_down_action.triggered.connect(self._move_selected_row_down)
 
         refresh_connection_status_action = QAction(get_icon("reload.png"), "Refresh Connection Status")
         refresh_connection_status_action.triggered.connect(self._on_refresh_status)
@@ -216,10 +251,12 @@ class DirectConnectionsWidget(QWidget):
         buttons_layout.addWidget(new_button)
         buttons_layout.addWidget(refresh_connection_status_button)
         buttons_layout.addStretch()
+        buttons_layout.addWidget(move_up_button)
+        buttons_layout.addWidget(move_down_button)
 
         layout = QVBoxLayout()
         layout.addLayout(buttons_layout)
-        layout.addWidget(view)
+        layout.addWidget(self.view)
         self.setLayout(layout)
 
         self.connection_status_threads: list[ConnectionStatusThread] = []
@@ -306,3 +343,15 @@ class DirectConnectionsWidget(QWidget):
         )
         if confirmed == QMessageBox.StandardButton.Yes:
             self.model.delete_direct_connection(row)
+
+    def _move_selected_row_up(self):
+        """Move the selected row up."""
+        selected_index = self.view.currentIndex()
+        if selected_index.isValid():
+            self.model.move_up(selected_index.row())
+
+    def _move_selected_row_down(self):
+        """Move the selected row down."""
+        selected_index = self.view.currentIndex()
+        if selected_index.isValid():
+            self.model.move_down(selected_index.row())
