@@ -5,6 +5,7 @@
 ![Contributors](https://img.shields.io/github/contributors/campbellmbrown/stassh)
 ![Issues](https://img.shields.io/github/issues/campbellmbrown/stassh)
 ![Pull Requests](https://img.shields.io/github/issues-pr/campbellmbrown/stassh)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ```
       ___           ___           ___           ___           ___           ___
