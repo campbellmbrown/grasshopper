@@ -104,7 +104,7 @@ You can also run the application from VS Code by running the `StaSSH` configurat
 ## Build the Executable
 
 > [!IMPORTANT]
-> Building the executable is done locally for now using Python 3.13.0.
+> Building the executable is done locally for now using Python 3.13.
 
 Build into a single executable without the console using PyInstaller:
 
