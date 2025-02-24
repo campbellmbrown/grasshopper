@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (
 )
 
 from app.connection import PortForward
+from app.ssh import SSH_DIR
 
 
 class PortForwardDialog(QDialog):
@@ -132,8 +133,6 @@ class PortForwardDialog(QDialog):
             self.accept()
 
     def _select_key(self):
-        key_file, _ = QFileDialog.getOpenFileName(
-            self, "Select Key File", directory=os.path.join(os.environ["USERPROFILE"], ".ssh")
-        )
+        key_file, _ = QFileDialog.getOpenFileName(self, "Select Key File", directory=SSH_DIR)
         if key_file:
             self.key_input.setText(key_file)

@@ -15,8 +15,8 @@ class ConfigFile:
             self.path = os.path.join(os.environ["APPDATA"], APP_DIR_WINDOWS, name)
         elif platform == "linux":
             self.path = os.path.join(os.environ["HOME"], ".config", APP_DIR_LINUX, name)
-        elif platform == "darwin":
-            raise NotImplementedError("macOS is not supported.")
+        else:
+            raise NotImplementedError(f"Platform '{platform}' is not supported")
 
     def load(self) -> dict:
         """Loads the configuration file from disk into a dictionary."""

@@ -20,6 +20,7 @@ from PyQt5.QtWidgets import (
 
 from app.connection import DEVICE_TYPE_ICONS, DeviceType, DirectConnection
 from app.icons import get_icon
+from app.ssh import SSH_DIR
 
 
 class DirectConnectionDialog(QDialog):
@@ -119,8 +120,6 @@ class DirectConnectionDialog(QDialog):
             self.accept()
 
     def _select_key(self):
-        file_path, _ = QFileDialog.getOpenFileName(
-            self, "Select Key File", directory=os.path.join(os.environ["USERPROFILE"], ".ssh")
-        )
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select Key File", directory=SSH_DIR)
         if file_path:
             self.key_input.setText(file_path)
