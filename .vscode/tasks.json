@@ -10,21 +10,35 @@
             "command": "python stassh.py"
         },
         {
+            "label": "clean",
+            "type": "shell",
+            "group": "build",
+            "command": "git clean -dfx -e .venv"
+        },
+        {
+            "label": "generate Git SHA",
+            "type": "shell",
+            "group": "build",
+            "command": "git rev-parse --short=8 HEAD > resources/GIT_SHA"
+        },
+        {
             "label": "publish",
             "type": "shell",
             "group": "build",
-            "command": "sh sh/publish.sh"
+            "command": "pyinstaller --onefile --noconsole --add-data \"resources;resources\" --icon=resources/logo.ico stassh.py"
         },
         {
             "label": "compile installer",
             "type": "shell",
             "group": "build",
-            "command": "rm -rf installer/*.exe && docker run --rm -v .:/work amake/innosetup:innosetup6 installer/installer.iss"
+            "command": "docker run --rm -v .:/work amake/innosetup:innosetup6 installer/installer.iss"
         },
         {
             "label": "publish & compile installer",
             "group": "build",
             "dependsOn": [
+                "clean",
+                "generate Git SHA",
                 "publish",
                 "compile installer"
             ],
