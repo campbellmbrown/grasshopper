@@ -7,19 +7,7 @@
 ![Pull Requests](https://img.shields.io/github/issues-pr/campbellmbrown/stassh)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-```
-      ___           ___           ___           ___           ___           ___
-     /\  \         /\  \         /\  \         /\  \         /\  \         /\__\
-    /::\  \        \:\  \       /::\  \       /::\  \       /::\  \       /:/  /
-   /:/\ \  \        \:\  \     /:/\:\  \     /:/\ \  \     /:/\ \  \     /:/__/
-  _\:\~\ \  \       /::\  \   /::\~\:\  \   _\:\~\ \  \   _\:\~\ \  \   /::\  \ ___
- /\ \:\ \ \__\     /:/\:\__\ /:/\:\ \:\__\ /\ \:\ \ \__\ /\ \:\ \ \__\ /:/\:\  /\__\
- \:\ \:\ \/__/    /:/  \/__/ \/__\:\/:/  / \:\ \:\ \/__/ \:\ \:\ \/__/ \/__\:\/:/  /
-  \:\ \:\__\     /:/  /           \::/  /   \:\ \:\__\    \:\ \:\__\        \::/  /
-   \:\/:/  /     \/__/            /:/  /     \:\/:/  /     \:\/:/  /        /:/  /
-    \::/  /                      /:/  /       \::/  /       \::/  /        /:/  /
-     \/__/                       \/__/         \/__/         \/__/         \/__/
-```
+![logo](https://github.com/campbellmbrown/stassh/blob/main/resources/logo_256x256.png?raw=true)
 
 StaSSH is a "stash" of your SSH connections.
 The goal is to provide a simple GUI allowing easily connections to your servers without having to remember tedious commands.
