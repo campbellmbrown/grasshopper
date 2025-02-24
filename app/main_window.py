@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import (
 )
 
 from app.direct_connection_page import DirectConnectionsWidget
-from app.icons import get_icon
+from app.icons import get_icon, get_pixmap
 from app.port_forward_page import PortForwardsWidget
 from app.proxy_jump_page import ProxyJumpsWidget
 from app.settings import Settings
@@ -49,8 +49,17 @@ class AboutDialog(QDialog):
         super().__init__()
         self.setWindowTitle("StaSSH")
         self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
+        self.setWindowIcon(get_icon("logo_32x32.png"))
+
+        pixmap = get_pixmap("logo_256x256.png")
+        # scale down
+        pixmap = pixmap.scaled(64, 64, Qt.AspectRatioMode.KeepAspectRatio)
+        label = QLabel()
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        label.setPixmap(pixmap)
 
         layout = QVBoxLayout()
+        layout.addWidget(label)
         layout.addWidget(QLabel(f"Version: {__version__}"))
         layout.addWidget(QLabel(f"SHA: {GIT_SHA}"))
         layout.addWidget(QLabel("Author: Campbell Brown"))

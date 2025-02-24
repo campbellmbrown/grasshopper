@@ -102,6 +102,14 @@ You can also run the application from VS Code by running the `StaSSH` configurat
 
 # Publishing
 
+## Clean
+
+Clean the build and dist directories:
+
+```bash
+git clean -dfx -e .venv
+```
+
 ## Build the Executable
 
 > [!IMPORTANT]
@@ -110,7 +118,8 @@ You can also run the application from VS Code by running the `StaSSH` configurat
 Build into a single executable without the console using PyInstaller:
 
 ```bash
-sh sh/publish.sh
+git rev-parse --short=8 HEAD > resources/GIT_SHA
+pyinstaller --onefile --noconsole --add-data "resources;resources" --icon=resources/logo.ico stassh.py
 ```
 
 The executable (``stassh.exe`` on Windows, ``stassh`` on Linux) will be in the ``dist`` directory.
@@ -120,6 +129,5 @@ The executable (``stassh.exe`` on Windows, ``stassh`` on Linux) will be in the `
 Build the installer using Docker on Windows:
 
 ```bash
-rm -rf installer/*.exe
 docker run --rm -v .:/work amake/innosetup:innosetup6 installer/installer.iss
 ```
