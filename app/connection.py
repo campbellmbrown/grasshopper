@@ -8,12 +8,14 @@ class DeviceType(str, Enum):
     RASPBERRY_PI = "Raspberry Pi"
     SERVER = "Server"
     CLOUD = "Web Server"
+    DOCKER = "Docker"
 
 
 DEVICE_TYPE_ICONS = {
     DeviceType.AZURE: "azure.png",
     DeviceType.CLOUD: "cloud.png",
     DeviceType.COMPUTER: "laptop.png",
+    DeviceType.DOCKER: "docker.png",
     DeviceType.RASPBERRY_PI: "rpi.png",
     DeviceType.SERVER: "server.png",
 }
