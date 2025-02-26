@@ -5,6 +5,7 @@ from enum import Enum
 class DeviceType(str, Enum):
     AZURE = "Azure"
     COMPUTER = "Computer"
+    JENKINS = "Jenkins"
     RASPBERRY_PI = "Raspberry Pi"
     SERVER = "Server"
     CLOUD = "Web Server"
@@ -14,6 +15,7 @@ class DeviceType(str, Enum):
 DEVICE_TYPE_ICONS = {
     DeviceType.AZURE: "azure.png",
     DeviceType.CLOUD: "cloud.png",
+    DeviceType.JENKINS: "jenkins.png",
     DeviceType.COMPUTER: "laptop.png",
     DeviceType.DOCKER: "docker.png",
     DeviceType.RASPBERRY_PI: "rpi.png",
