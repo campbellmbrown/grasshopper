@@ -102,7 +102,9 @@ class PortForward:
 
     DEFAULT_SSH_PORT = 22
     DEFAULT_FORWARD_PORT = 8080
+    DEFAULT_DEVICE_TYPE = DeviceType.SERVER
 
+    device_type: str
     name: str
     notes: str
     local_port: int
@@ -121,6 +123,7 @@ class PortForward:
     def to_dict(self) -> dict:
         """Convert the port forward to a dictionary."""
         return {
+            "device_type": self.device_type,
             "name": self.name,
             "notes": self.notes,
             "local_port": self.local_port,
@@ -135,6 +138,7 @@ class PortForward:
     def copy(self) -> "PortForward":
         """Create a copy of the port forward."""
         return PortForward(
+            device_type=self.device_type,
             name=self.name,
             notes=self.notes,
             local_port=self.local_port,
@@ -150,6 +154,7 @@ class PortForward:
     def default() -> "PortForward":
         """Get a port forward containing default values."""
         return PortForward(
+            device_type=PortForward.DEFAULT_DEVICE_TYPE,
             name="",
             notes="",
             local_port=PortForward.DEFAULT_FORWARD_PORT,
@@ -165,6 +170,9 @@ class PortForward:
     def from_dict(data: dict) -> "PortForward":
         """Create a port forward from a dictionary. If a key is not present, the default value will be used."""
         port_forward = PortForward.default()
+        device_type = data.get("device_type")
+        if device_type is not None and device_type in DeviceType:
+            port_forward.device_type = device_type
         port_forward.name = data.get("name", port_forward.name)
         port_forward.notes = data.get("notes", port_forward.notes)
         port_forward.local_port = data.get("local_port", port_forward.local_port)

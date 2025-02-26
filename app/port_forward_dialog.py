@@ -1,7 +1,6 @@
-import os
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
+    QComboBox,
     QDialog,
     QDialogButtonBox,
     QFileDialog,
@@ -17,7 +16,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
 )
 
-from app.connection import PortForward
+from app.connection import DEVICE_TYPE_ICONS, DeviceType, PortForward
+from app.icons import get_icon
 from app.ssh import SSH_DIR
 
 
@@ -28,6 +28,9 @@ class PortForwardDialog(QDialog):
         self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
 
         default_port_forward = PortForward.default()
+        self.device_type_combo_box = QComboBox()
+        for device_type in DeviceType:
+            self.device_type_combo_box.addItem(get_icon(DEVICE_TYPE_ICONS[device_type]), device_type)
         self.name_input = QLineEdit(default_port_forward.name)
         self.local_port_input = QSpinBox()
         self.local_port_input.setRange(0, 65535)
@@ -50,9 +53,11 @@ class PortForwardDialog(QDialog):
         self.notes_input = QTextEdit(default_port_forward.notes)
 
         details_group = QGroupBox("Details")
-        details_group_layout = QVBoxLayout()
-        details_group_layout.addWidget(QLabel("Name"))
-        details_group_layout.addWidget(self.name_input)
+        details_group_layout = QGridLayout()
+        details_group_layout.addWidget(QLabel("Device Type"), 0, 0)
+        details_group_layout.addWidget(QLabel("Name"), 0, 1)
+        details_group_layout.addWidget(self.device_type_combo_box, 1, 0)
+        details_group_layout.addWidget(self.name_input, 1, 1)
         details_group.setLayout(details_group_layout)
 
         connection_group = QGroupBox("Connection")
@@ -92,6 +97,7 @@ class PortForwardDialog(QDialog):
         self.setLayout(layout)
 
     def populate_fields(self, port_forward: PortForward):
+        self.device_type_combo_box.setCurrentText(port_forward.device_type)
         self.name_input.setText(port_forward.name)
         self.local_port_input.setValue(port_forward.local_port)
         self.target_host_input.setText(port_forward.target_host)
@@ -104,6 +110,7 @@ class PortForwardDialog(QDialog):
 
     def to_port_forward(self) -> PortForward:
         return PortForward(
+            device_type=self.device_type_combo_box.currentText(),
             name=self.name_input.text(),
             notes=self.notes_input.toPlainText(),
             local_port=self.local_port_input.value(),

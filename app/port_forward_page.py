@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import (
 
 from app.common import StyleSheets, ViewBase
 from app.config_file import ConfigFile
-from app.connection import PortForward
+from app.connection import DEVICE_TYPE_ICONS, DeviceType, PortForward
 from app.icons import get_icon
 from app.port_forward_dialog import PortForwardDialog
 
@@ -129,6 +129,10 @@ class PortForwardsModel(QAbstractTableModel):
 
         col = index.column()
         row = index.row()
+
+        if role == Qt.ItemDataRole.DecorationRole:
+            if col == PortForwardsHeader.NAME:
+                return get_icon(DEVICE_TYPE_ICONS[DeviceType(self.port_forwards[row].device_type)])
 
         if role == Qt.ItemDataRole.DisplayRole:  # What's displayed to the user
             if col == PortForwardsHeader.NAME:
