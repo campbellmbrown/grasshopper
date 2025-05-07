@@ -1,7 +1,7 @@
 import socket
 from enum import Enum
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal
 
 from app.connection import DirectConnection
 

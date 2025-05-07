@@ -1,6 +1,6 @@
-from PyQt5.QtCore import QItemSelectionModel, Qt, pyqtSignal
-from PyQt5.QtGui import QContextMenuEvent, QKeyEvent
-from PyQt5.QtWidgets import QAction, QMenu, QTableView
+from PyQt6.QtCore import QItemSelectionModel, Qt, pyqtSignal
+from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent
+from PyQt6.QtWidgets import QMenu, QTableView
 
 from app.icons import get_icon
 
@@ -64,7 +64,7 @@ class ViewBase(QTableView):
         self.duplicate_action.setEnabled(is_valid)
         self.delete_action.setEnabled(is_valid)
         self.copy_command_action.setEnabled(is_valid)
-        self.menu.exec_(event.globalPos())
+        self.menu.exec(event.globalPos())
 
     def keyPressEvent(self, event: QKeyEvent):
         if self.currentIndex().isValid():

@@ -1,4 +1,4 @@
 pyinstaller
-PyQt5
+PyQt6
 pyqtdarktheme
 requests

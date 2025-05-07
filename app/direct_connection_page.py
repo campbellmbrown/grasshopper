@@ -4,10 +4,9 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
-from PyQt5.QtGui import QClipboard, QColor
-from PyQt5.QtWidgets import (
-    QAction,
+from PyQt6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
+from PyQt6.QtGui import QAction, QClipboard, QColor
+from PyQt6.QtWidgets import (
     QApplication,
     QDialog,
     QHBoxLayout,
@@ -176,7 +175,7 @@ class DirectConnectionsModel(QAbstractTableModel):
             if col == DirectConnectionsHeader.CONNECTION_STATUS:
                 return self.connection_statuses[row].value
 
-    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+    def flags(self, index: QModelIndex) -> Qt.ItemFlag:
         return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int) -> Any:
@@ -185,7 +184,7 @@ class DirectConnectionsModel(QAbstractTableModel):
                 return self.headers[DirectConnectionsHeader(section)]
             if role == Qt.ItemDataRole.TextAlignmentRole:
                 return Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
-            if role == Qt.ItemDataRole.TextColorRole:
+            if role == Qt.ItemDataRole.ForegroundRole:
                 return QColor(Qt.GlobalColor.gray)
 
     def _load(self):
@@ -301,7 +300,7 @@ class DirectConnectionsWidget(QWidget):
     def _on_new_direct_connection(self):
         """Open a new direct connection dialog."""
         dialog = DirectConnectionDialog("New Direct Connection")
-        result = dialog.exec_()
+        result = dialog.exec()
         if result == QDialog.DialogCode.Accepted:
             new_direct_connection = dialog.to_direct_connection()
             self.model.add_direct_connection(new_direct_connection)
@@ -313,7 +312,7 @@ class DirectConnectionsWidget(QWidget):
 
         dialog = DirectConnectionDialog("Edit Direct Connection")
         dialog.populate_fields(direct_connection)
-        result = dialog.exec_()
+        result = dialog.exec()
         if result == QDialog.DialogCode.Accepted:
             edited_direct_connection = dialog.to_direct_connection()
             self.model.update_direct_connection(row, dialog.to_direct_connection())
@@ -326,7 +325,7 @@ class DirectConnectionsWidget(QWidget):
         direct_connection.name += " (Copy)"
         dialog = DirectConnectionDialog("New Direct Connection")
         dialog.populate_fields(direct_connection)
-        result = dialog.exec_()
+        result = dialog.exec()
         if result == QDialog.DialogCode.Accepted:
             new_direct_connection = dialog.to_direct_connection()
             self.model.add_direct_connection(new_direct_connection)

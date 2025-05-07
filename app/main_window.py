@@ -1,10 +1,9 @@
 import logging
 
 import qdarktheme
-from PyQt5.QtCore import QObject, Qt, pyqtSignal
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import (
-    QActionGroup,
+from PyQt6.QtCore import QObject, Qt, pyqtSignal
+from PyQt6.QtGui import QActionGroup, QFont
+from PyQt6.QtWidgets import (
     QApplication,
     QDialog,
     QDockWidget,
@@ -158,13 +157,13 @@ class MainWindow(QMainWindow):
     def _on_about(self):
         """Show the about dialog."""
         about_dialog = AboutDialog()
-        about_dialog.exec_()
+        about_dialog.exec()
 
     def _on_new_version_available(self, latest_version: str, url: str, publish_date: str):
         """Show a dialog to inform the user that a new version is available."""
         if self.settings.prompt_to_download_new_version:
             new_version_dialog = NewVersionDialog(self.settings, latest_version, url, publish_date)
-            new_version_dialog.exec_()
+            new_version_dialog.exec()
 
     def _change_theme(self, theme: str):
         """Change the application theme."""

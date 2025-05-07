@@ -4,10 +4,9 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
-from PyQt5.QtGui import QClipboard, QColor
-from PyQt5.QtWidgets import (
-    QAction,
+from PyQt6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
+from PyQt6.QtGui import QAction, QClipboard, QColor
+from PyQt6.QtWidgets import (
     QApplication,
     QDialog,
     QHBoxLayout,
@@ -171,7 +170,7 @@ class PortForwardsModel(QAbstractTableModel):
             if col == PortForwardsHeader.KEY:
                 return self.port_forwards[row].key
 
-    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+    def flags(self, index: QModelIndex) -> Qt.ItemFlag:
         return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int) -> Any:
@@ -180,7 +179,7 @@ class PortForwardsModel(QAbstractTableModel):
                 return self.headers[PortForwardsHeader(section)]
             if role == Qt.ItemDataRole.TextAlignmentRole:
                 return Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
-            if role == Qt.ItemDataRole.TextColorRole:
+            if role == Qt.ItemDataRole.ForegroundRole:
                 return QColor(Qt.GlobalColor.gray)
 
     def _load(self):
@@ -268,7 +267,7 @@ class PortForwardsWidget(QWidget):
     def _on_new_port_forward(self):
         """Open a new port forward dialog."""
         dialog = PortForwardDialog("New Port Forward")
-        result = dialog.exec_()
+        result = dialog.exec()
         if result == QDialog.DialogCode.Accepted:
             self.model.add_port_forward(dialog.to_port_forward())
 
@@ -279,7 +278,7 @@ class PortForwardsWidget(QWidget):
 
         dialog = PortForwardDialog("Edit Port Forward")
         dialog.populate_fields(port_forward)
-        result = dialog.exec_()
+        result = dialog.exec()
         if result == QDialog.DialogCode.Accepted:
             self.model.update_port_forward(source_index.row(), dialog.to_port_forward())
 
@@ -290,7 +289,7 @@ class PortForwardsWidget(QWidget):
         port_forward.name += " (Copy)"
         dialog = PortForwardDialog("New Port Forward")
         dialog.populate_fields(port_forward)
-        result = dialog.exec_()
+        result = dialog.exec()
         if result == QDialog.DialogCode.Accepted:
             self.model.add_port_forward(dialog.to_port_forward())
 

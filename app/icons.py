@@ -1,7 +1,7 @@
 import os
 import sys
 
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt6.QtGui import QIcon, QPixmap
 
 
 def get_resource_path(resource: str) -> str:

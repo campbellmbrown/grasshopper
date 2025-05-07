@@ -4,10 +4,9 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt5.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
-from PyQt5.QtGui import QClipboard, QColor
-from PyQt5.QtWidgets import (
-    QAction,
+from PyQt6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
+from PyQt6.QtGui import QAction, QClipboard, QColor
+from PyQt6.QtWidgets import (
     QApplication,
     QDialog,
     QHBoxLayout,
@@ -171,7 +170,7 @@ class ProxyJumpsModel(QAbstractTableModel):
             if col == ProxyJumpsHeader.KEY:
                 return self.proxy_jumps[row].key
 
-    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+    def flags(self, index: QModelIndex) -> Qt.ItemFlag:
         return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int) -> Any:
@@ -180,7 +179,7 @@ class ProxyJumpsModel(QAbstractTableModel):
                 return self.headers[ProxyJumpsHeader(section)]
             if role == Qt.ItemDataRole.TextAlignmentRole:
                 return Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
-            if role == Qt.ItemDataRole.TextColorRole:
+            if role == Qt.ItemDataRole.ForegroundRole:
                 return QColor(Qt.GlobalColor.gray)
 
     def _load(self):
@@ -261,7 +260,7 @@ class ProxyJumpsWidget(QWidget):
     def _on_new_proxy_jump(self):
         """Open a new proxy jump dialog."""
         dialog = ProxyJumpDialog("New proxy jump")
-        result = dialog.exec_()
+        result = dialog.exec()
         if result == QDialog.DialogCode.Accepted:
             self.model.add_proxy_jump(dialog.to_proxy_jump())
 
@@ -271,7 +270,7 @@ class ProxyJumpsWidget(QWidget):
 
         dialog = ProxyJumpDialog("Edit proxy jump")
         dialog.populate_fields(proxy_jump)
-        result = dialog.exec_()
+        result = dialog.exec()
         if result == QDialog.DialogCode.Accepted:
             self.model.update_proxy_jump(row, dialog.to_proxy_jump())
 
@@ -281,7 +280,7 @@ class ProxyJumpsWidget(QWidget):
         proxy_jump.name += " (Copy)"
         dialog = ProxyJumpDialog("New proxy jump")
         dialog.populate_fields(proxy_jump)
-        result = dialog.exec_()
+        result = dialog.exec()
         if result == QDialog.DialogCode.Accepted:
             self.model.add_proxy_jump(dialog.to_proxy_jump())
 
