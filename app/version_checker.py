@@ -91,7 +91,7 @@ class GetLatestVersionThread(QThread):
             logging.info("No new version available.")
 
     def _get_latest_release(self) -> dict | None:
-        url = "https://api.github.com/repos/campbellmbrown/stassh/releases/latest"
+        url = "https://api.github.com/repos/campbellmbrown/grasshopper/releases/latest"
         logging.info("Checking %s...", url)
         try:
             response = requests.get(url)

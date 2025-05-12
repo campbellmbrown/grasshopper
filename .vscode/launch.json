@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "StaSSH",
+            "name": "Grasshopper",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/stassh.py",
+            "program": "${workspaceFolder}/grasshopper.py",
             "console": "integratedTerminal"
         }
     ]

@@ -2,8 +2,7 @@ import json
 import os
 from sys import platform
 
-APP_DIR_WINDOWS = "StaSSH"
-APP_DIR_LINUX = "stassh"
+APP_DIR = "grasshopper"
 
 
 class ConfigFile:
@@ -12,9 +11,9 @@ class ConfigFile:
     def __init__(self, name: str):
         self.name = name
         if platform == "win32":
-            self.path = os.path.join(os.environ["APPDATA"], APP_DIR_WINDOWS, name)
+            self.path = os.path.join(os.environ["APPDATA"], APP_DIR, name)
         elif platform == "linux":
-            self.path = os.path.join(os.environ["HOME"], ".config", APP_DIR_LINUX, name)
+            self.path = os.path.join(os.environ["HOME"], ".config", APP_DIR, name)
         else:
             raise NotImplementedError(f"Platform '{platform}' is not supported")
 

@@ -7,7 +7,7 @@
             "label": "run",
             "type": "shell",
             "group": "build",
-            "command": "python stassh.py"
+            "command": "python grasshopper.py"
         },
         {
             "label": "clean",
@@ -25,7 +25,7 @@
             "label": "publish",
             "type": "shell",
             "group": "build",
-            "command": "pyinstaller --onefile --noconsole --add-data \"resources;resources\" --icon=resources/logo.ico stassh.py"
+            "command": "pyinstaller --onefile --noconsole --add-data \"resources;resources\" --icon=resources/logo.ico grasshopper.py"
         },
         {
             "label": "compile installer",

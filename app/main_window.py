@@ -46,7 +46,7 @@ class Logger(logging.Handler, QObject):
 class AboutDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("StaSSH")
+        self.setWindowTitle("Grasshopper")
         self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.setWindowIcon(get_icon("logo_32x32.png"))
 
@@ -62,7 +62,9 @@ class AboutDialog(QDialog):
         layout.addWidget(QLabel(f"Version: {__version__}"))
         layout.addWidget(QLabel(f"SHA: {GIT_SHA}"))
         layout.addWidget(QLabel("Author: Campbell Brown"))
-        github_label = QLabel('GitHub: <a href="https://github.com/campbellmbrown/stassh">campbellmbrown/stassh</a>')
+        github_label = QLabel(
+            'GitHub: <a href="https://github.com/campbellmbrown/grasshopper">campbellmbrown/grasshopper</a>'
+        )
         github_label.setOpenExternalLinks(True)
         layout.addWidget(github_label)
         self.setLayout(layout)
@@ -71,7 +73,7 @@ class AboutDialog(QDialog):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(f"StaSSH {__version__}")
+        self.setWindowTitle(f"Grasshopper {__version__}")
         self.resize(1000, 800)
         self.setWindowIcon(get_icon("logo_32x32.png"))
 

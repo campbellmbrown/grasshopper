@@ -1,15 +1,15 @@
-# StaSSH
+# Grasshopper
 
-![License](https://img.shields.io/github/license/campbellmbrown/stassh)
-![Release](https://img.shields.io/github/v/release/campbellmbrown/stassh)
-![Contributors](https://img.shields.io/github/contributors/campbellmbrown/stassh)
-![Issues](https://img.shields.io/github/issues/campbellmbrown/stassh)
-![Pull Requests](https://img.shields.io/github/issues-pr/campbellmbrown/stassh)
+![License](https://img.shields.io/github/license/campbellmbrown/grasshopper)
+![Release](https://img.shields.io/github/v/release/campbellmbrown/grasshopper)
+![Contributors](https://img.shields.io/github/contributors/campbellmbrown/grasshopper)
+![Issues](https://img.shields.io/github/issues/campbellmbrown/grasshopper)
+![Pull Requests](https://img.shields.io/github/issues-pr/campbellmbrown/grasshopper)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-![logo](https://github.com/campbellmbrown/stassh/blob/main/resources/logo_256x256.png?raw=true)
+![logo](https://github.com/campbellmbrown/grasshopper/blob/main/resources/logo_256x256.png?raw=true)
 
-StaSSH is a "stash" of your SSH connections.
+Grasshopper is a simple SSH client that allows you to connect to your servers using SSH.
 The goal is to provide a simple GUI allowing easily connections to your servers without having to remember tedious commands.
 
 ## Direct Connections
@@ -27,7 +27,7 @@ These additional properties are for personal identification:
 - **Name**
 - **Notes**
 
-Direct connections are saved to `%APPDATA%/StaSSH/direct_connections.json` on Windows or `~/.config/stassh/direct_connections.json` on Linux.
+Direct connections are saved to `%APPDATA%/grasshopper/direct_connections.json` on Windows or `~/.config/grasshopper/direct_connections.json` on Linux.
 
 ## Proxy Jumps
 
@@ -47,7 +47,7 @@ These additional properties are for personal identification:
 - **Name**
 - **Notes**
 
-Proxy jumps are saved to `%APPDATA%/StaSSH/proxy_jumps.json` on Windows or `~/.config/stassh/proxy_jumps.json` on Linux.
+Proxy jumps are saved to `%APPDATA%/grasshopper/proxy_jumps.json` on Windows or `~/.config/grasshopper/proxy_jumps.json` on Linux.
 
 ## Port Forwarding
 
@@ -66,7 +66,7 @@ These additional properties are for personal identification:
 - **Name**
 - **Notes**
 
-Port forwarding are saved to `%APPDATA%/StaSSH/port_forwards.json` on Windows or `~/.config/stassh/port_forwards.json` on Linux.
+Port forwarding are saved to `%APPDATA%/grasshopper/port_forwards.json` on Windows or `~/.config/grasshopper/port_forwards.json` on Linux.
 
 # Setup
 
@@ -81,12 +81,12 @@ pip install -r requirements.txt
 ## From the Command Line
 
 ```bash
-python stassh.py
+python grasshopper.py
 ```
 
 ## From VS Code
 
-You can also run the application from VS Code by running the `StaSSH` configuration.
+You can also run the application from VS Code by running the `Grasshopper` configuration.
 
 # Publishing
 
@@ -107,10 +107,10 @@ Build into a single executable without the console using PyInstaller:
 
 ```bash
 git rev-parse --short=8 HEAD > resources/GIT_SHA
-pyinstaller --onefile --noconsole --add-data "resources;resources" --icon=resources/logo.ico stassh.py
+pyinstaller --onefile --noconsole --add-data "resources;resources" --icon=resources/logo.ico grasshopper.py
 ```
 
-The executable (``stassh.exe`` on Windows, ``stassh`` on Linux) will be in the ``dist`` directory.
+The executable (``grasshopper.exe`` on Windows, ``grasshopper`` on Linux) will be in the ``dist`` directory.
 
 # Build the Installer
 
