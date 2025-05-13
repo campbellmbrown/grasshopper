@@ -1,57 +1,29 @@
-import logging
 import os
 import subprocess
 from sys import platform
 
 import qdarktheme
-from PyQt6.QtCore import QObject, Qt, pyqtSignal
-from PyQt6.QtGui import QActionGroup, QFont
-from PyQt6.QtWidgets import (
-    QApplication,
-    QDockWidget,
-    QMainWindow,
-    QMenu,
-    QMenuBar,
-    QPlainTextEdit,
-    QTabWidget,
-    QVBoxLayout,
-    QWidget,
-)
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QActionGroup
+from PyQt6.QtWidgets import QApplication, QDockWidget, QMainWindow, QMenu, QMenuBar, QTabWidget, QVBoxLayout, QWidget
 
 from app.dialogs.about.about_controller import AboutController
 from app.dialogs.about.about_view import AboutView
 from app.direct_connection_page import DirectConnectionsWidget
 from app.icons import get_icon
+from app.main.log_view import LogView
 from app.port_forward_page import PortForwardsWidget
 from app.proxy_jump_page import ProxyJumpsWidget
 from app.settings import Settings
-from app.version import __version__
 from app.version_checker import GetLatestVersionThread, NewVersionDialog
 
 
-class Logger(logging.Handler, QObject):
-    append_to_widget = pyqtSignal(str)
-
+class MainView(QMainWindow):
     def __init__(self):
         super().__init__()
-        QObject.__init__(self)
-        self.widget = QPlainTextEdit()
-        self.widget.setReadOnly(True)
-        self.widget.setFont(QFont("Consolas"))  # Use a fixed width font
-        self.widget.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
-        self.append_to_widget.connect(self.widget.appendPlainText)
-
-    def emit(self, record):
-        msg = self.format(record)
-        self.append_to_widget.emit(msg)
-
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle(f"Grasshopper {__version__}")
-        self.resize(1000, 800)
         self.setWindowIcon(get_icon("logo_32x32.png"))
+        self.resize(1000, 800)
+        self._set_up_dock()
 
         self.settings = Settings()
         self.settings.load()
@@ -112,27 +84,22 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         layout.addWidget(tabs)
 
-        dock = QDockWidget("Log")
-        log_handler = Logger()
-        dock.setWidget(log_handler.widget)
-        dock.setFeatures(
-            QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable
-        )
-
-        log_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
-        logging.getLogger().addHandler(log_handler)
-        logging.getLogger().setLevel(logging.INFO)
-
-        logging.info("v%s", __version__)
-
         central_widget = QWidget()
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
-        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, dock)
 
         self.version_check_thread = GetLatestVersionThread()
         self.version_check_thread.new_version_available.connect(self._on_new_version_available)
         self.version_check_thread.start()
+
+    def _set_up_dock(self) -> None:
+        self.log_view = LogView()
+        dock = QDockWidget("Log")
+        dock.setWidget(self.log_view)
+        dock.setFeatures(
+            QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable
+        )
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, dock)
 
     def _on_about(self):
         """Show the about dialog."""
