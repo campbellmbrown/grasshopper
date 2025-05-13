@@ -8,8 +8,8 @@ from app.utility.resource_provider import get_resource_path
 from app.utility.semver import SemVer
 
 URL = "https://api.github.com/repos/campbellmbrown/grasshopper/releases/latest"
-VERSION_PATH = "resources/VERSION"
-GIT_SHA_PATH = "resources/GIT_SHA"
+VERSION_PATH = "VERSION"
+GIT_SHA_PATH = "GIT_SHA"
 
 
 @dataclass
