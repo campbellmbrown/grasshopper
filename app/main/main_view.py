@@ -1,26 +1,12 @@
-import qdarktheme
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction, QActionGroup
-from PyQt6.QtWidgets import (
-    QApplication,
-    QDockWidget,
-    QMainWindow,
-    QMenu,
-    QMenuBar,
-    QTabWidget,
-    QVBoxLayout,
-    QWidget,
-)
+from PyQt6.QtWidgets import QDockWidget, QMainWindow, QMenu, QMenuBar, QTabWidget, QVBoxLayout, QWidget
 
-from app.dialogs.about.about_controller import AboutController
-from app.dialogs.about.about_view import AboutView
 from app.direct_connection_page import DirectConnectionsWidget
 from app.icons import get_icon
 from app.main.log_view import LogView
 from app.port_forward_page import PortForwardsWidget
 from app.proxy_jump_page import ProxyJumpsWidget
-from app.settings import Settings
-from app.version_checker import GetLatestVersionThread, NewVersionDialog
 
 
 class MainView(QMainWindow):
@@ -29,9 +15,6 @@ class MainView(QMainWindow):
         self.setWindowIcon(get_icon("logo_32x32.png"))
         self.resize(1000, 800)
         self._set_up_dock()
-
-        self.settings = Settings()
-        self.settings.load()
         direct_connections_widget = DirectConnectionsWidget()
         proxy_jumps_widget = ProxyJumpsWidget()
         port_forwards_widget = PortForwardsWidget()
@@ -41,33 +24,20 @@ class MainView(QMainWindow):
         theme_menu = QMenu("&Theme", self)
         preferences_menu.addMenu(theme_menu)
 
+        self.open_ssh_directory_action = QAction("&Open SSH directory")
+        self.light_theme_action = QAction("Light")
+        self.dark_theme_action = QAction("Dark")
+        self.about_action = QAction("&About")
+        self.prompt_to_download_new_version_action = QAction("&Check version")
+
         theme_action_group = QActionGroup(self)
         theme_action_group.setExclusive(True)
-        light_theme_action = theme_action_group.addAction("light")
-        dark_theme_action = theme_action_group.addAction("dark")
-        assert light_theme_action is not None
-        assert dark_theme_action is not None
-        light_theme_action.setCheckable(True)
-        dark_theme_action.setCheckable(True)
-        theme_menu.addAction(light_theme_action)
-        theme_menu.addAction(dark_theme_action)
-        dark_theme_action.triggered.connect(lambda: self._change_theme("dark"))
-        light_theme_action.triggered.connect(lambda: self._change_theme("light"))
+        self.light_theme_action.setCheckable(True)
+        self.dark_theme_action.setCheckable(True)
+        theme_menu.addAction(self.light_theme_action)
+        theme_menu.addAction(self.dark_theme_action)
 
-        prompt_to_download_new_version_action = preferences_menu.addAction("&Check version")
-        assert prompt_to_download_new_version_action is not None
-        prompt_to_download_new_version_action.setCheckable(True)
-        prompt_to_download_new_version_action.setChecked(self.settings.prompt_to_download_new_version)
-        prompt_to_download_new_version_action.triggered.connect(self._change_prompt_to_download_new_version)
-
-        if self.settings.theme == "dark":
-            dark_theme_action.setChecked(True)
-            self._change_theme("dark")
-        else:  # Default to light theme
-            light_theme_action.setChecked(True)
-            self._change_theme("light")
-
-        self.open_ssh_directory_action = QAction("&Open SSH directory")
+        self.prompt_to_download_new_version_action.setCheckable(True)
 
         file_menu.addAction(self.open_ssh_directory_action)
         file_menu.addSeparator()
@@ -75,8 +45,10 @@ class MainView(QMainWindow):
         file_menu.addSeparator()
         file_menu.addAction("E&xit", self.close)
 
+        preferences_menu.addAction(self.prompt_to_download_new_version_action)
+
         help_menu = QMenu("&Help", self)
-        help_menu.addAction("&About", self._on_about)
+        help_menu.addAction(self.about_action)
 
         menu_bar = QMenuBar()
         menu_bar.addMenu(file_menu)
@@ -95,10 +67,6 @@ class MainView(QMainWindow):
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
-        self.version_check_thread = GetLatestVersionThread()
-        self.version_check_thread.new_version_available.connect(self._on_new_version_available)
-        self.version_check_thread.start()
-
     def _set_up_dock(self) -> None:
         self.log_view = LogView()
         dock = QDockWidget("Log")
@@ -107,31 +75,3 @@ class MainView(QMainWindow):
             QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable
         )
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, dock)
-
-    def _on_about(self):
-        """Show the about dialog."""
-        about_dialog = AboutView()
-        AboutController(about_dialog)
-        about_dialog.exec()
-
-    def _on_new_version_available(self, latest_version: str, url: str, publish_date: str):
-        """Show a dialog to inform the user that a new version is available."""
-        if self.settings.prompt_to_download_new_version:
-            new_version_dialog = NewVersionDialog(self.settings, latest_version, url, publish_date)
-            new_version_dialog.exec()
-
-    def _change_theme(self, theme: str):
-        """Change the application theme."""
-        stylesheet = qdarktheme.load_stylesheet(theme)
-        application = QApplication.instance()
-        assert isinstance(application, QApplication)
-        application.setStyleSheet(stylesheet)
-        self.settings.set_theme(theme)
-
-    def _change_prompt_to_download_new_version(self, checked: bool):
-        """Change the setting to prompt to download new version setting.
-
-        Args:
-            checked (bool): Whether to prompt to download new versions.
-        """
-        self.settings.set_prompt_to_download_new_version(checked)

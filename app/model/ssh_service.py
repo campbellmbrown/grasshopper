@@ -3,7 +3,7 @@ import subprocess
 from sys import platform
 
 
-class SshModel:
+class SshService:
     def __init__(self) -> None:
         pass
 

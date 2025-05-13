@@ -2,3 +2,4 @@ pyinstaller
 PyQt6
 pyqtdarktheme
 requests
+types-requests
