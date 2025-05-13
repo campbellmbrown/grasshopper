@@ -1,11 +1,16 @@
-import os
-import subprocess
-from sys import platform
-
 import qdarktheme
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QActionGroup
-from PyQt6.QtWidgets import QApplication, QDockWidget, QMainWindow, QMenu, QMenuBar, QTabWidget, QVBoxLayout, QWidget
+from PyQt6.QtGui import QAction, QActionGroup
+from PyQt6.QtWidgets import (
+    QApplication,
+    QDockWidget,
+    QMainWindow,
+    QMenu,
+    QMenuBar,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
 from app.dialogs.about.about_controller import AboutController
 from app.dialogs.about.about_view import AboutView
@@ -62,7 +67,9 @@ class MainView(QMainWindow):
             light_theme_action.setChecked(True)
             self._change_theme("light")
 
-        file_menu.addAction("&Open SSH directory", self._open_ssh_directory)
+        self.open_ssh_directory_action = QAction("&Open SSH directory")
+
+        file_menu.addAction(self.open_ssh_directory_action)
         file_menu.addSeparator()
         file_menu.addMenu(preferences_menu)
         file_menu.addSeparator()
@@ -128,11 +135,3 @@ class MainView(QMainWindow):
             checked (bool): Whether to prompt to download new versions.
         """
         self.settings.set_prompt_to_download_new_version(checked)
-
-    def _open_ssh_directory(self) -> None:
-        if platform == "win32":
-            path = os.path.join(os.environ["USERPROFILE"], ".ssh")
-            os.startfile(path)
-        elif platform == "linux":
-            path = os.path.join(os.environ["HOME"], ".ssh")
-            subprocess.run(["xdg-open", path])
