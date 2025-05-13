@@ -2,7 +2,7 @@ from PyQt6.QtCore import QItemSelectionModel, Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent
 from PyQt6.QtWidgets import QMenu, QTableView
 
-from app.icons import get_icon
+from app.utility.resource_provider import get_icon
 
 
 class StyleSheets:

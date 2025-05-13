@@ -17,8 +17,8 @@ from PyQt6.QtWidgets import (
 )
 
 from app.connection import DEVICE_TYPE_ICONS, DeviceType, DirectConnection
-from app.icons import get_icon
 from app.ssh import SSH_DIR
+from app.utility.resource_provider import get_icon
 
 
 class DirectConnectionDialog(QDialog):

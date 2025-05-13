@@ -20,8 +20,8 @@ from PyQt6.QtWidgets import (
 from app.common import StyleSheets, ViewBase
 from app.config_file import ConfigFile
 from app.connection import DEVICE_TYPE_ICONS, DeviceType, PortForward
-from app.icons import get_icon
 from app.port_forward_dialog import PortForwardDialog
+from app.utility.resource_provider import get_icon
 
 
 class PortForwardsHeader(IntEnum):

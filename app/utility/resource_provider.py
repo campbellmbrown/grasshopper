@@ -7,7 +7,7 @@ from PyQt6.QtGui import QIcon, QPixmap
 def get_resource_path(resource: str) -> str:
     path = f"resources/{resource}"
     if hasattr(sys, "_MEIPASS"):
-        path = os.path.join(sys._MEIPASS, path)
+        path = os.path.join(sys._MEIPASS, path)  # type: ignore
     return path
 
 

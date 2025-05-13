@@ -1,8 +1,8 @@
 from PyQt6.QtCore import Qt
 
 from app.dialogs.about_view import AboutView
-from app.icons import get_icon, get_pixmap
 from app.model.model import Model
+from app.utility.resource_provider import get_icon, get_pixmap
 
 
 class AboutController:

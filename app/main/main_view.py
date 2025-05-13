@@ -3,10 +3,10 @@ from PyQt6.QtGui import QAction, QActionGroup
 from PyQt6.QtWidgets import QDockWidget, QMainWindow, QMenu, QMenuBar, QTabWidget, QVBoxLayout, QWidget
 
 from app.direct_connection_page import DirectConnectionsWidget
-from app.icons import get_icon
 from app.main.log_view import LogView
 from app.port_forward_page import PortForwardsWidget
 from app.proxy_jump_page import ProxyJumpsWidget
+from app.utility.resource_provider import get_icon
 
 
 class MainView(QMainWindow):

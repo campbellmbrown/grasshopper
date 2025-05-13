@@ -26,7 +26,7 @@ from app.connection_status import (
     ConnectionStatusThread,
 )
 from app.direct_connection_dialog import DirectConnectionDialog
-from app.icons import get_icon
+from app.utility.resource_provider import get_icon
 
 
 class DirectConnectionsHeader(IntEnum):

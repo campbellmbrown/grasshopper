@@ -1,10 +1,10 @@
 import logging
 import os
-import sys
 from dataclasses import dataclass
 
 import requests
 
+from app.utility.resource_provider import get_resource_path
 from app.utility.semver import SemVer
 
 URL = "https://api.github.com/repos/campbellmbrown/grasshopper/releases/latest"
@@ -21,16 +21,10 @@ class VersionInfo:
 
 class VersionService:
     def __init__(self) -> None:
-        # TODO: abstract _MEIPASS to a resources utility
-        version_path = VERSION_PATH
-        git_sha_path = GIT_SHA_PATH
-        if hasattr(sys, "_MEIPASS"):
-            version_path = os.path.join(sys._MEIPASS, VERSION_PATH)
-        with open(version_path) as version_file:
+        with open(get_resource_path(VERSION_PATH)) as version_file:
             self.current = version_file.read().strip()
 
-        if hasattr(sys, "_MEIPASS"):
-            git_sha_path = os.path.join(sys._MEIPASS, GIT_SHA_PATH)
+        git_sha_path = get_resource_path(GIT_SHA_PATH)
         if not os.path.exists(git_sha_path):
             logging.warning("GIT_SHA file not found. This is likely a build issue (unpublished).")
             git_sha = "unknown"
