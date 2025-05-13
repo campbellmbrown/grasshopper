@@ -8,9 +8,7 @@ from PyQt6.QtCore import QObject, Qt, pyqtSignal
 from PyQt6.QtGui import QActionGroup, QFont
 from PyQt6.QtWidgets import (
     QApplication,
-    QDialog,
     QDockWidget,
-    QLabel,
     QMainWindow,
     QMenu,
     QMenuBar,
@@ -20,12 +18,14 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from app.dialogs.about.about_controller import AboutController
+from app.dialogs.about.about_view import AboutView
 from app.direct_connection_page import DirectConnectionsWidget
-from app.icons import get_icon, get_pixmap
+from app.icons import get_icon
 from app.port_forward_page import PortForwardsWidget
 from app.proxy_jump_page import ProxyJumpsWidget
 from app.settings import Settings
-from app.version import GIT_SHA, __version__
+from app.version import __version__
 from app.version_checker import GetLatestVersionThread, NewVersionDialog
 
 
@@ -44,33 +44,6 @@ class Logger(logging.Handler, QObject):
     def emit(self, record):
         msg = self.format(record)
         self.append_to_widget.emit(msg)
-
-
-class AboutDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Grasshopper")
-        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
-        self.setWindowIcon(get_icon("logo_32x32.png"))
-
-        pixmap = get_pixmap("logo_256x256.png")
-        # scale down
-        pixmap = pixmap.scaled(64, 64, Qt.AspectRatioMode.KeepAspectRatio)
-        label = QLabel()
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        label.setPixmap(pixmap)
-
-        layout = QVBoxLayout()
-        layout.addWidget(label)
-        layout.addWidget(QLabel(f"Version: {__version__}"))
-        layout.addWidget(QLabel(f"SHA: {GIT_SHA}"))
-        layout.addWidget(QLabel("Author: Campbell Brown"))
-        github_label = QLabel(
-            'GitHub: <a href="https://github.com/campbellmbrown/grasshopper">campbellmbrown/grasshopper</a>'
-        )
-        github_label.setOpenExternalLinks(True)
-        layout.addWidget(github_label)
-        self.setLayout(layout)
 
 
 class MainWindow(QMainWindow):
@@ -163,7 +136,8 @@ class MainWindow(QMainWindow):
 
     def _on_about(self):
         """Show the about dialog."""
-        about_dialog = AboutDialog()
+        about_dialog = AboutView()
+        AboutController(about_dialog)
         about_dialog.exec()
 
     def _on_new_version_available(self, latest_version: str, url: str, publish_date: str):
