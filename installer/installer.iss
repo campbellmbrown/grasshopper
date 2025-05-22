@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Grasshopper"
-#define MyAppVersion "1.5.2"
+#define MyAppVersion "2.0.0"
 #define MyAppPublisher "Campbell Brown"
 #define MyAppURL "https://github.com/campbellmbrown/grasshopper"
 #define MyAppExeName "grasshopper.exe"
