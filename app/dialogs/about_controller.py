@@ -1,4 +1,4 @@
-from PyQt6.QtCore import Qt
+from PySide6.QtCore import Qt
 
 from app.dialogs.about_view import AboutView
 from app.model.model import Model

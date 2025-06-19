@@ -1,6 +1,6 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction, QActionGroup
-from PyQt6.QtWidgets import QDockWidget, QMainWindow, QMenu, QMenuBar, QTabWidget, QVBoxLayout, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QAction, QActionGroup
+from PySide6.QtWidgets import QDockWidget, QMainWindow, QMenu, QMenuBar, QTabWidget, QVBoxLayout, QWidget
 
 from app.direct_connection_page import DirectConnectionsWidget
 from app.main.log_view import LogView

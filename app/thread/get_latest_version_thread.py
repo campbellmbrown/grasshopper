@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QThread, pyqtSignal
+from PySide6.QtCore import QThread, Signal
 
 from app.model.model import Model
 
@@ -10,7 +10,7 @@ class GetLatestVersionThread(QThread):
         super().__init__()
         self.model = model
 
-    new_version_available = pyqtSignal(str, str, str)  # version, url, publish date
+    new_version_available = Signal(str, str, str)  # version, url, publish date
 
     def run(self):
         latest_release = self.model.version.get_latest_version()

@@ -1,7 +1,7 @@
 import socket
 from enum import Enum
 
-from PyQt6.QtCore import QThread, pyqtSignal
+from PySide6.QtCore import QThread, Signal
 
 from app.connection import DirectConnection
 
@@ -22,7 +22,7 @@ CONNECTION_STATUS_ICONS = {
 class ConnectionStatusThread(QThread):
     """Thread to check the connection status of a DirectConnection."""
 
-    status_updated = pyqtSignal(ConnectionStatus)
+    status_updated = Signal(ConnectionStatus)
 
     def __init__(self, direct_connection: DirectConnection):
         super().__init__()

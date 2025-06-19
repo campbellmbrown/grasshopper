@@ -1,7 +1,7 @@
 import logging
 
 import qdarktheme  # type: ignore[import]
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 
 from app.dialogs.about_controller import AboutController
 from app.dialogs.about_view import AboutView

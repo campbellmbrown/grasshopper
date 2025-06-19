@@ -1,5 +1,5 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
     QDialogButtonBox,
@@ -118,6 +118,6 @@ class DirectConnectionDialog(QDialog):
             self.accept()
 
     def _select_key(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Select Key File", directory=SSH_DIR)
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select Key File", dir=SSH_DIR)
         if file_path:
             self.key_input.setText(file_path)

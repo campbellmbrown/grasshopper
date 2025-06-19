@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox
 
 from app.dialogs.new_version_view import NewVersionView
 from app.model.model import Model

@@ -1,6 +1,6 @@
 import sys
 
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 
 from app.dialogs.exception_view import ExceptionView
 from app.main.main_controller import MainController

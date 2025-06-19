@@ -1,6 +1,6 @@
-from PyQt6.QtCore import QItemSelectionModel, Qt, pyqtSignal
-from PyQt6.QtGui import QAction, QContextMenuEvent, QKeyEvent
-from PyQt6.QtWidgets import QMenu, QTableView
+from PySide6.QtCore import QItemSelectionModel, Qt, Signal
+from PySide6.QtGui import QAction, QContextMenuEvent, QKeyEvent
+from PySide6.QtWidgets import QMenu, QTableView
 
 from app.utility.resource_provider import get_icon
 
@@ -22,12 +22,12 @@ class StyleSheets:
 class ViewBase(QTableView):
     """Base class for all table views in the application."""
 
-    item_activated = pyqtSignal(int)
-    new_item = pyqtSignal()
-    edit_item = pyqtSignal(int)
-    duplicate_item = pyqtSignal(int)
-    delete_item = pyqtSignal(int)
-    copy_command = pyqtSignal(int)
+    item_activated = Signal(int)
+    new_item = Signal()
+    edit_item = Signal(int)
+    duplicate_item = Signal(int)
+    delete_item = Signal(int)
+    copy_command = Signal(int)
 
     def __init__(self):
         super().__init__()
@@ -57,7 +57,8 @@ class ViewBase(QTableView):
         self.delete_action.triggered.connect(lambda: self.delete_item.emit(self.currentIndex().row()))
         self.copy_command_action.triggered.connect(lambda: self.copy_command.emit(self.currentIndex().row()))
 
-    def contextMenuEvent(self, event: QContextMenuEvent) -> None:
+    def contextMenuEvent(self, event: QContextMenuEvent | None) -> None:
+        assert event is not None
         index = self.indexAt(event.pos())
         is_valid = index.isValid()
         self.edit_action.setEnabled(is_valid)
@@ -66,7 +67,8 @@ class ViewBase(QTableView):
         self.copy_command_action.setEnabled(is_valid)
         self.menu.exec(event.globalPos())
 
-    def keyPressEvent(self, event: QKeyEvent):
+    def keyPressEvent(self, event: QKeyEvent | None) -> None:
+        assert event is not None
         if self.currentIndex().isValid():
             if event.key() == Qt.Key.Key_Delete:
                 self.delete_item.emit(self.currentIndex().row())

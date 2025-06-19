@@ -1,5 +1,5 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
     QDialogButtonBox,
@@ -140,6 +140,6 @@ class PortForwardDialog(QDialog):
             self.accept()
 
     def _select_key(self):
-        key_file, _ = QFileDialog.getOpenFileName(self, "Select Key File", directory=SSH_DIR)
+        key_file, _ = QFileDialog.getOpenFileName(self, "Select Key File", dir=SSH_DIR)
         if key_file:
             self.key_input.setText(key_file)

@@ -2,7 +2,7 @@ import sys
 import traceback
 from types import TracebackType
 
-from PyQt6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtWidgets import QApplication, QMessageBox
 
 from app.utility.resource_provider import get_icon
 

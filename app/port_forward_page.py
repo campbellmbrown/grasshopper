@@ -4,9 +4,9 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
-from PyQt6.QtGui import QAction, QClipboard, QColor
-from PyQt6.QtWidgets import (
+from PySide6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
+from PySide6.QtGui import QAction, QClipboard, QColor
+from PySide6.QtWidgets import (
     QApplication,
     QDialog,
     QHBoxLayout,

@@ -4,9 +4,9 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
-from PyQt6.QtGui import QAction, QClipboard, QColor
-from PyQt6.QtWidgets import (
+from PySide6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, QPersistentModelIndex, Qt
+from PySide6.QtGui import QAction, QClipboard, QColor
+from PySide6.QtWidgets import (
     QApplication,
     QDialog,
     QHBoxLayout,
@@ -43,7 +43,7 @@ class DirectConnectionsHeader(IntEnum):
 class DirectConnectionsModel(QAbstractTableModel):
     """Model for the direct connections table."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.direct_connections: list[DirectConnection] = []
         self.connection_statuses: list[ConnectionStatus] = []
@@ -127,13 +127,15 @@ class DirectConnectionsModel(QAbstractTableModel):
             self.connection_statuses[row] = status
             self.dataChanged.emit(self.index(row, 0), self.index(row, len(self.headers) - 1))
 
-    def rowCount(self, parent: QModelIndex) -> int:
+    def rowCount(self, parent: QModelIndex | QPersistentModelIndex = QModelIndex()) -> int:
         return len(self.direct_connections)
 
-    def columnCount(self, parent: QModelIndex) -> int:
+    def columnCount(self, parent: QModelIndex | QPersistentModelIndex = QModelIndex()) -> int:
         return len(DirectConnectionsHeader)
 
-    def data(self, index: QModelIndex, role: int) -> Any:
+    def data(
+        self, index: QModelIndex | QPersistentModelIndex = QModelIndex(), role: int = Qt.ItemDataRole.DisplayRole
+    ) -> Any:
         if not index.isValid():
             return
 
@@ -175,10 +177,10 @@ class DirectConnectionsModel(QAbstractTableModel):
             if col == DirectConnectionsHeader.CONNECTION_STATUS:
                 return self.connection_statuses[row].value
 
-    def flags(self, index: QModelIndex) -> Qt.ItemFlag:
+    def flags(self, index: QModelIndex | QPersistentModelIndex = QModelIndex()) -> Qt.ItemFlag:
         return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
 
-    def headerData(self, section: int, orientation: Qt.Orientation, role: int) -> Any:
+    def headerData(self, section: int, orientation: Qt.Orientation, role: int = Qt.ItemDataRole.DisplayRole) -> Any:
         if orientation == Qt.Orientation.Horizontal:
             if role == Qt.ItemDataRole.DisplayRole:
                 return self.headers[DirectConnectionsHeader(section)]
@@ -199,7 +201,7 @@ class DirectConnectionsModel(QAbstractTableModel):
 
 
 class DirectConnectionsView(ViewBase):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
     def attach_model(self, model: QAbstractItemModel):
@@ -214,7 +216,7 @@ class DirectConnectionsView(ViewBase):
 
 
 class DirectConnectionsWidget(QWidget):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.view = DirectConnectionsView()

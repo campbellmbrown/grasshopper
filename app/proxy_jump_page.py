@@ -4,9 +4,9 @@ import subprocess
 from enum import IntEnum
 from typing import Any
 
-from PyQt6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
-from PyQt6.QtGui import QAction, QClipboard, QColor
-from PyQt6.QtWidgets import (
+from PySide6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, Qt
+from PySide6.QtGui import QAction, QClipboard, QColor
+from PySide6.QtWidgets import (
     QApplication,
     QDialog,
     QHBoxLayout,
@@ -122,7 +122,7 @@ class ProxyJumpsModel(QAbstractTableModel):
     def columnCount(self, parent: QModelIndex) -> int:
         return len(ProxyJumpsHeader)
 
-    def data(self, index: QModelIndex, role: int) -> Any:
+    def data(self, index: QModelIndex, role: int = Qt.ItemDataRole.DisplayRole) -> Any:
         if not index.isValid():
             return
 
@@ -173,7 +173,7 @@ class ProxyJumpsModel(QAbstractTableModel):
     def flags(self, index: QModelIndex) -> Qt.ItemFlag:
         return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
 
-    def headerData(self, section: int, orientation: Qt.Orientation, role: int) -> Any:
+    def headerData(self, section: int, orientation: Qt.Orientation, role: int = Qt.ItemDataRole.DisplayRole) -> Any:
         if orientation == Qt.Orientation.Horizontal:
             if role == Qt.ItemDataRole.DisplayRole:
                 return self.headers[ProxyJumpsHeader(section)]
